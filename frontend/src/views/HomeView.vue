@@ -5,6 +5,7 @@
       <div class="logo">BITShared</div>
       <nav class="nav-menu">
         <button class="nav-item" @click="goToPage('/')">首页</button>
+        <button class="nav-item" @click="goToPage('/courses')">课程</button>
         <button class="nav-item" @click="goToPage('/settings')">设置</button>
       </nav>
     </aside>
@@ -80,6 +81,7 @@
               v-for="course in currentCourseList"
               :key="course.courseNo"
               class="course-card"
+              @click="goToCourseDetail(course.courseNo)"
           >
             <div class="course-icon">📚</div>
             <div class="course-info">
@@ -102,6 +104,11 @@
 </template>
 
 <script setup>
+
+defineOptions({
+  name: 'HomeView'
+})
+
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
@@ -186,6 +193,15 @@ function selectMajor(major) {
   currentSelectedMajor.value = major
   showDropdown.value = false
   errorMessage.value = ''
+}
+
+function goToCourseDetail(courseNo) {
+  // 这里的 params 要和路由配置里的 :courseNo 对应
+  // 或者直接写路径: router.push(`/course/${courseNo}`)
+  router.push({
+    name: 'CourseDetail',
+    params: { courseNo: courseNo }
+  })
 }
 
 async function handleSearch() {
@@ -491,6 +507,8 @@ const goToPage = (path) => router.push(path)
   gap: 15px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
   transition: transform 0.2s, box-shadow 0.2s;
+
+  cursor: pointer;
 }
 
 .course-card:hover {
