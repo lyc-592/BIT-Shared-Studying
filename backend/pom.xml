@@ -63,9 +63,15 @@
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
 
 
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>
@@ -73,7 +79,43 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
+
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>1.2.2</version>
+
+				<configuration>
+					<!-- 镜像名：建议用全小写 -->
+					<imageName>sharing</imageName>
+					<imageTags>
+						<imageTag>latest</imageTag>
+					</imageTags>
+
+					<!-- 远程 Docker 守护进程 -->
+					<dockerHost>http://47.94.122.20:2375</dockerHost>
+
+					<!-- Docker 构建上下文目录（你按之前建议如果建了 docker 目录，就用这一行） -->
+					<dockerDirectory>${project.basedir}/docker</dockerDirectory>
+
+					<!-- 只把 jar 拷贝到 docker 目录 -->
+					<resources>
+						<resource>
+							<targetPath>/</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+					</resources>
+				</configuration>
+			</plugin>
+
 		</plugins>
+
+
+
 	</build>
+
+
 
 </project>
