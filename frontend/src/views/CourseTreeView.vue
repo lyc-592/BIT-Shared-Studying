@@ -13,7 +13,7 @@
     <div v-if="showModal" class="action-modal" :style="{ top: modalPos.y + 'px', left: modalPos.x + 'px' }">
       <div class="modal-title">{{ selectedNode.name }}</div>
 
-      <!-- 初始菜单按钮组 -->
+      <!-- 菜单按钮组 -->
       <div class="btn-group" v-if="!showCreateInput && !showUploadInput">
         <button class="btn-primary" @click="handleOpenFolder">📂 打开文件夹</button>
         <button class="btn-warning" @click="showUploadInput = true">⬆️ 上传文件</button>
@@ -21,7 +21,7 @@
         <button class="btn-danger" @click="handleDeleteNode">🗑️ 删除此节点</button>
       </div>
 
-      <!-- 1. 新建文件夹输入框 -->
+      <!-- 新建文件夹 -->
       <div v-if="showCreateInput" class="sub-action-box">
         <input v-model="newFolderName" placeholder="输入文件夹名" class="modal-input" />
         <div class="action-buttons">
@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <!-- 2. 上传文件区域 -->
+      <!-- 上传文件 -->
       <div v-if="showUploadInput" class="sub-action-box">
         <input type="file" ref="treeFileInputRef" @change="handleTreeFileSelect" class="file-input" />
         <div class="action-buttons">
@@ -112,8 +112,6 @@ async function fetchTreeData() {
     const data = res.data
     rawTreeData.value = Array.isArray(data) ? data : [data]
 
-    // 核心：转换数据 (传入 undefined 作为初始 parentPath)
-    // 假设 rawTreeData[0] 是根节点 (课程文件夹)
     if (rawTreeData.value.length > 0) {
       const echartsData = transformToECharts(rawTreeData.value[0])
       renderChart(echartsData)
@@ -125,26 +123,24 @@ async function fetchTreeData() {
 }
 
 /**
- * 递归转换数据：
- * 1. 修复路径：强制根据父子层级拼接完整路径
- * 2. 计算文件数、设置颜色、设置矩形形状
+ * 递归转换数据
+ * 修改点：增大尺寸、调整字体、保留路径逻辑
  */
 function transformToECharts(node, parentPath = '') {
-  // --- 路径修复逻辑 ---
-  // 如果 parentPath 为空，说明是根节点，直接用 node.name
-  // 否则，拼接 parentPath + '/' + node.name
-  let currentFullPath = node.name
-  if (parentPath) {
-    currentFullPath = `${parentPath}/${node.name}`
+  // 1. 路径修复逻辑 (保留之前的修正)
+  let currentFullPath = ''
+  if (!parentPath && node.name === 'root') {
+    currentFullPath = ''
+  } else {
+    currentFullPath = parentPath ? `${parentPath}/${node.name}` : node.name
   }
 
-  // 计算文件数
+  // 2. 计算文件数 & 颜色
   let fileCount = 0
   if (node.children && node.children.length > 0) {
     fileCount = node.children.filter(child => child.type === 'file').length
   }
 
-  // 决定颜色
   let nodeColor = '#67C23A' // 绿
   let textColor = '#fff'
   if (fileCount >= 10) {
@@ -152,28 +148,40 @@ function transformToECharts(node, parentPath = '') {
     textColor = '#fff'
   } else if (fileCount > 0) {
     nodeColor = '#E6A23C'   // 黄
-    textColor = '#333'
+    textColor = '#333' // 黄底黑字更清晰
   }
 
   const formatted = {
     name: node.name,
-    path: currentFullPath, // 使用拼接好的全路径
+    path: currentFullPath,
     type: node.type,
     children: [],
 
-    // 样式
-    symbol: 'roundRect',
-    symbolSize: [140, 40],
+    // --- 核心修改：节点外观 ---
+    symbol: 'roundRect', // 圆角矩形
+
+    // 修改点：增大尺寸 [宽, 高]
+    // 之前是 [140, 40]，现在改为 [180, 55] 看起来更充实
+    symbolSize: [180, 55],
+
     itemStyle: {
       color: nodeColor,
       borderColor: nodeColor,
-      borderWidth: 1
+      borderWidth: 1,
+      // 如果 ECharts 版本较新，可以加阴影让它更有立体感
+      shadowBlur: 5,
+      shadowColor: 'rgba(0, 0, 0, 0.2)'
     },
+
     label: {
       color: textColor,
+      // 修改点：增大字体
+      fontSize: 16,
+      fontWeight: 'bold',
       formatter: function(params) {
         let str = params.name
-        if (str.length > 8) str = str.substring(0, 8) + '...'
+        // 修改点：增加截断长度，因为框变大了
+        if (str.length > 10) str = str.substring(0, 10) + '...'
         return `${str} (${fileCount})`
       }
     }
@@ -182,7 +190,6 @@ function transformToECharts(node, parentPath = '') {
   // 递归处理子文件夹
   if (node.children && node.children.length > 0) {
     const folderChildren = node.children.filter(child => child.type === 'directory')
-    // 传递 currentFullPath 给子节点
     formatted.children = folderChildren.map(child => transformToECharts(child, currentFullPath))
   }
 
@@ -200,18 +207,26 @@ function renderChart(data) {
       {
         type: 'tree',
         data: [data],
-        top: '1%', bottom: '1%', left: '5%', right: '20%',
+
+        // 布局位置
+        top: '5%', bottom: '5%', left: '5%', right: '20%',
+
         layout: 'orthogonal',
         orient: 'LR',         // 从左到右
-        expandAndCollapse: false, // 禁止点击收缩
-        initialTreeDepth: -1,     // 默认展开所有
-        roam: true,
+
+        expandAndCollapse: false, // 禁止收缩，展示全貌
+        initialTreeDepth: -1,
+        roam: true,           // 允许缩放和平移
+
+        // 核心修改：调整层级间距
+        // 因为节点变宽了(180px)，我们需要把层级拉开，否则可能会挤在一起
+        // ECharts Tree 自动布局通常还好，但如果挤了可以调整这个逻辑，
+        // 或者单纯靠 ECharts 自动计算。
+
         label: {
           position: 'inside',
           verticalAlign: 'middle',
-          align: 'center',
-          fontSize: 14,
-          fontWeight: 'bold'
+          align: 'center'
         },
         leaves: {
           label: {
@@ -220,10 +235,12 @@ function renderChart(data) {
             align: 'center'
           }
         },
+
+        // 连线样式优化
         lineStyle: {
           color: '#ccc',
           width: 2,
-          curveness: 0.5
+          curveness: 0.5 // 曲线连接，增加层次感
         }
       }
     ]
@@ -231,17 +248,15 @@ function renderChart(data) {
   myChart.setOption(option)
 }
 
-// --- 交互逻辑 ---
+// --- 交互逻辑 (保持不变) ---
 
 function openModal(nodeData, event) {
   selectedNode.value = nodeData
-  // 防止弹窗溢出
   const x = Math.min(event.clientX + 10, window.innerWidth - 220)
   const y = Math.min(event.clientY + 10, window.innerHeight - 250)
   modalPos.value = { x, y }
 
   showModal.value = true
-  // 重置子状态
   showCreateInput.value = false
   newFolderName.value = ''
   showUploadInput.value = false
@@ -253,21 +268,19 @@ function closeModal() {
   selectedNode.value = null
 }
 
-// 1. 打开文件夹
 function handleOpenFolder() {
   if (!selectedNode.value) return
   router.push({
     name: 'FolderFiles',
     params: { courseNo: courseNo },
     query: {
-      path: selectedNode.value.path, // 这是完整路径
+      path: selectedNode.value.path,
       folderName: selectedNode.value.name
     }
   })
   closeModal()
 }
 
-// 2. 上传文件 (Tree View)
 function handleTreeFileSelect(event) {
   treeSelectedFile.value = event.target.files[0]
 }
@@ -281,7 +294,7 @@ async function handleTreeUpload() {
 
   const formData = new FormData()
   formData.append('file', treeSelectedFile.value)
-  formData.append('targetDir', selectedNode.value.path) // 使用完整路径
+  formData.append('targetDir', selectedNode.value.path)
 
   try {
     const res = await axios.post('/api/files/upload', formData, {
@@ -290,7 +303,7 @@ async function handleTreeUpload() {
     if (res.data && res.data.success) {
       alert('上传成功')
       closeModal()
-      await fetchTreeData() // 刷新树状态（比如颜色变化）
+      await fetchTreeData()
     } else {
       alert('上传失败: ' + (res.data.message || '未知错误'))
     }
@@ -301,12 +314,10 @@ async function handleTreeUpload() {
   }
 }
 
-// 3. 新建文件夹
 async function handleCreateFolder() {
   if (!newFolderName.value) return
 
   const parentPath = selectedNode.value.path
-  // 拼接路径
   const separator = parentPath.endsWith('/') ? '' : '/'
   const targetPath = `${parentPath}${separator}${newFolderName.value}`
 
@@ -327,7 +338,6 @@ async function handleCreateFolder() {
   }
 }
 
-// 4. 删除节点
 async function handleDeleteNode() {
   const nodeName = selectedNode.value.name
   if (!confirm(`确定要删除文件夹 "${nodeName}" 及其所有内容吗？\n此操作不可恢复！`)) return
@@ -351,6 +361,7 @@ async function handleDeleteNode() {
 </script>
 
 <style scoped>
+/* 样式保持不变 */
 .tree-container { width: 100%; height: 100vh; position: relative; background: #fdfdfd; display: flex; flex-direction: column; }
 .header { padding: 10px 20px; background: #fff; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; z-index: 10; }
 .chart-box { flex: 1; width: 100%; }
