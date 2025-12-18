@@ -1,6 +1,7 @@
 package com.example.sharing.service;
 
 import com.example.sharing.dto.ApiResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.core.io.Resource;
@@ -10,14 +11,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.file.*;
 import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class FileStorageService {
@@ -220,7 +222,7 @@ public class FileStorageService {
             }
 
             // 9. 对文件名进行编码，确保中文等特殊字符能正确显示
-            String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString())
+            String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8)
                     .replaceAll("\\+", "%20");
 
             // 10. 构建响应实体
@@ -309,6 +311,89 @@ public class FileStorageService {
         }
     }
 
+
+    /**
+     * 创建 ZIP 压缩包（多个文件打包）
+     */
+    public ResponseEntity<Resource> downloadMultipleFiles(String[] relativePaths, HttpServletRequest request) {
+        // 创建临时 ZIP 文件
+        Path tempZip = null;
+        try {
+            tempZip = Files.createTempFile("download_", ".zip");
+
+            // 使用 ZipOutputStream 创建 ZIP 文件
+            try (OutputStream os = Files.newOutputStream(tempZip);
+                 ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(os))) {
+
+                for (String relativePath : relativePaths) {
+                    try {
+                        Path sourcePath = getFullPath(relativePath.trim());
+                        System.out.println(sourcePath.toString());
+                        if (!Files.exists(sourcePath)) {
+                            continue; // 跳过不存在的文件
+                        }
+
+                        if (Files.isDirectory(sourcePath)) {
+                            // 如果是目录，递归添加目录中的所有文件
+                            addDirectoryToZip(sourcePath, zos, relativePath);
+                        } else {
+                            // 如果是文件，直接添加到 ZIP
+                            addFileToZip(sourcePath, zos, relativePath);
+                        }
+                    } catch (Exception e) {
+                        // 记录错误，继续处理其他文件
+                        System.err.println("添加文件到ZIP失败: " + relativePath + " - " + e.getMessage());
+                    }
+                }
+
+                zos.finish(); // 确保所有数据写入
+            }
+
+            // 检查 ZIP 文件是否有效
+            if (Files.size(tempZip) == 0) {
+                throw new RuntimeException("ZIP文件为空，没有可下载的文件");
+            }
+
+            // 创建资源对象
+            Path finalTempZip = tempZip;
+            Resource resource = new UrlResource(tempZip.toUri()) {
+                @Override
+                public @NotNull InputStream getInputStream() throws IOException {
+                    // 在输入流关闭后删除临时文件
+                    return new FilterInputStream(super.getInputStream()) {
+                        @Override
+                        public void close() throws IOException {
+                            super.close();
+                            // 删除临时文件
+                            Files.deleteIfExists(finalTempZip);
+                        }
+                    };
+                }
+            };
+
+            // 设置响应头
+            String filename = "download_" + System.currentTimeMillis() + ".zip";
+            String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType("application/zip"))
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + filename + "\"; filename*=UTF-8''" + encodedFilename)
+                    .body(resource);
+
+        } catch (Exception e) {
+            // 如果发生异常，删除临时文件
+            if (tempZip != null) {
+                try {
+                    Files.deleteIfExists(tempZip);
+                } catch (IOException ex) {
+                    // 忽略删除错误
+                }
+            }
+            throw new RuntimeException("创建ZIP文件失败: " + e.getMessage());
+        }
+    }
 
     // ============ 私有辅助方法 ============
 
@@ -476,7 +561,7 @@ public class FileStorageService {
             }
 
             // 对文件名进行编码，确保中文等特殊字符能正确显示
-            String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8.toString())
+            String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8)
                     .replaceAll("\\+", "%20");
 
             // 返回 Content-Disposition 头
@@ -519,37 +604,22 @@ public class FileStorageService {
                 String fileName = filePath.getFileName().toString();
                 String extension = getFileExtension(fileName).toLowerCase();
 
-                switch (extension) {
-                    case "pdf":
-                        return "application/pdf";
-                    case "doc":
-                        return "application/msword";
-                    case "docx":
-                        return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-                    case "ppt":
-                        return "application/vnd.ms-powerpoint";
-                    case "pptx":
-                        return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-                    case "xls":
-                        return "application/vnd.ms-excel";
-                    case "xlsx":
-                        return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    case "jpg":
-                    case "jpeg":
-                        return "image/jpeg";
-                    case "png":
-                        return "image/png";
-                    case "gif":
-                        return "image/gif";
-                    case "txt":
-                        return "text/plain";
-                    case "zip":
-                        return "application/zip";
-                    case "rar":
-                        return "application/x-rar-compressed";
-                    default:
-                        return "application/octet-stream";
-                }
+                return switch (extension) {
+                    case "pdf" -> "application/pdf";
+                    case "doc" -> "application/msword";
+                    case "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                    case "ppt" -> "application/vnd.ms-powerpoint";
+                    case "pptx" -> "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+                    case "xls" -> "application/vnd.ms-excel";
+                    case "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    case "jpg", "jpeg" -> "image/jpeg";
+                    case "png" -> "image/png";
+                    case "gif" -> "image/gif";
+                    case "txt" -> "text/plain";
+                    case "zip" -> "application/zip";
+                    case "rar" -> "application/x-rar-compressed";
+                    default -> "application/octet-stream";
+                };
             }
             return contentType;
         } catch (Exception e) {
@@ -565,7 +635,7 @@ public class FileStorageService {
         String fileName = filePath.getFileName().toString();
 
         // 如果文件名有问题，从相对路径中提取
-        if (fileName == null || fileName.isEmpty() || fileName.contains("?")) {
+        if (fileName.isEmpty() || fileName.contains("?")) {
             // 从相对路径的最后一部分获取文件名
             String[] parts = relativePath.split("[\\\\/]");
             if (parts.length > 0) {
@@ -579,5 +649,59 @@ public class FileStorageService {
         }
 
         return fileName;
+    }
+
+    /**
+     * 添加文件到 ZIP
+     */
+    private void addFileToZip(Path sourcePath, ZipOutputStream zos, String relativePath) throws IOException {
+        // 确保文件存在且是普通文件
+        if (!Files.exists(sourcePath) || !Files.isRegularFile(sourcePath)) {
+            return;
+        }
+
+        // 创建 ZIP 条目
+        String entryName = relativePath.replace('\\', '/');
+        ZipEntry zipEntry = new ZipEntry(entryName);
+        zipEntry.setSize(Files.size(sourcePath));
+        zipEntry.setTime(Files.getLastModifiedTime(sourcePath).toMillis());
+
+        // 添加到 ZIP
+        zos.putNextEntry(zipEntry);
+
+        // 复制文件内容到 ZIP
+        try (InputStream is = new BufferedInputStream(Files.newInputStream(sourcePath))) {
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = is.read(buffer)) > 0) {
+                zos.write(buffer, 0, len);
+            }
+        }
+
+        zos.closeEntry();
+    }
+
+    /**
+     * 添加目录到 ZIP
+     */
+    private void addDirectoryToZip(Path sourceDir, ZipOutputStream zos, String relativePath) throws IOException {
+        // 确保目录存在
+        if (!Files.exists(sourceDir) || !Files.isDirectory(sourceDir)) {
+            return;
+        }
+
+        // 遍历目录中的所有文件
+        Files.walkFileTree(sourceDir, new SimpleFileVisitor<Path>() {
+            @Override
+            public @NotNull FileVisitResult visitFile(@NotNull Path file, @NotNull BasicFileAttributes attrs) throws IOException {
+                // 计算文件在 ZIP 中的相对路径
+                String fileRelativePath = relativePath + "/" + sourceDir.relativize(file);
+                fileRelativePath = fileRelativePath.replace('\\', '/');
+
+                // 添加文件到 ZIP
+                addFileToZip(file, zos, fileRelativePath);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 }

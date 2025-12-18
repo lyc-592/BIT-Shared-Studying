@@ -34,7 +34,7 @@ public class MajorController {
      */
     @GetMapping("/{majorNo}/courses")
     public ApiResponse<List<CourseDto>> getCoursesByMajor(
-            @PathVariable("majorNo") Long majorNo) {
+            @PathVariable("majorNo") String majorNo) {
 
         List<CourseDto> courses = majorService.getCoursesByMajorNo(majorNo);
         return ApiResponse.success("获取课程列表成功", courses);

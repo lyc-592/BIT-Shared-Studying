@@ -8,6 +8,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/files")
 public class FileController {
@@ -74,13 +77,7 @@ public class FileController {
             @RequestParam("path") String path,
             HttpServletRequest request) {
 
-        ResponseEntity<Resource> response = fileStorageService.downloadFile(path, request, false);
-
-        // 修改 Content-Disposition 为 inline，让浏览器尝试直接打开
-        return ResponseEntity.ok()
-                .contentType(response.getHeaders().getContentType())
-                .header("Content-Disposition", "inline")
-                .body(response.getBody());
+        return fileStorageService.downloadFile(path, request, false);
     }
 
     /**
@@ -91,5 +88,67 @@ public class FileController {
     @GetMapping("/info")
     public ApiResponse<FileStorageService.FileInfo> getFileInfo(@RequestParam("path") String path) {
         return fileStorageService.getFileInfo(path);
+    }
+
+    /**
+     * 批量下载接口 - 返回文件流（适用于多个文件打包下载）
+     * 参数：
+     *   paths: 要下载的文件路径数组，用逗号分隔
+     */
+    @GetMapping("/batch-download")
+    public ResponseEntity<Resource> batchDownload(
+            @RequestParam("paths") String paths,
+            HttpServletRequest request) {
+
+        try {
+            // 将逗号分隔的路径字符串转为数组
+            String[] filePaths = paths.split(",");
+
+            if (filePaths.length == 0) {
+                throw new RuntimeException("请指定要下载的文件");
+            }
+
+            if (filePaths.length == 1) {
+                // 如果只有一个文件，直接下载
+                return fileStorageService.downloadFile(filePaths[0].trim(), request, true);
+            } else {
+                // 多个文件，创建ZIP压缩包
+                return fileStorageService.downloadMultipleFiles(filePaths, request);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("批量下载失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 批量获取文件信息接口
+     * 参数：
+     *   paths: 文件路径数组，用逗号分隔
+     */
+    @GetMapping("/batch-info")
+    public ApiResponse<List<FileStorageService.FileInfo>> getBatchFileInfo(
+            @RequestParam("paths") String paths) {
+
+        try {
+            String[] filePaths = paths.split(",");
+            List<FileStorageService.FileInfo> fileInfos = new ArrayList<>();
+
+            for (String path : filePaths) {
+                path = path.trim();
+                if (!path.isEmpty()) {
+                    ApiResponse<FileStorageService.FileInfo> response =
+                            fileStorageService.getFileInfo(path);
+                    if (response.isSuccess()) {
+                        fileInfos.add(response.getData());
+                    }
+                }
+            }
+
+            return ApiResponse.success("获取文件信息成功", fileInfos);
+
+        } catch (Exception e) {
+            return ApiResponse.fail("获取文件信息失败: " + e.getMessage());
+        }
     }
 }
