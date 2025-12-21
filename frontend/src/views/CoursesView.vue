@@ -16,7 +16,7 @@
             <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="输入关键词在本地过滤..."
+                placeholder="输入课程名称或ID在本地过滤..."
                 class="search-input"
                 @input="handleLocalSearch"
             />
@@ -27,7 +27,8 @@
         <div class="top-right">
           <button v-if="!isLoggedIn" @click="goToLogin" class="nav-btn">登录 / 注册</button>
           <div v-else class="welcome-user">
-            <span class="welcome-text">欢迎，{{ currentUsername }}</span>
+            <span class="role-badge" :style="badgeStyle">{{ roleName }}</span>
+            <span class="welcome-text">{{ currentUsername }}</span>
             <button @click="logout" class="logout-btn">退出</button>
           </div>
         </div>
@@ -40,16 +41,14 @@
           <span class="count-badge">({{ displayList.length }})</span>
         </h2>
 
-        <!-- 加载动画 -->
         <div v-if="loading" class="loading-state">数据同步中...</div>
 
-        <!-- 课程列表 -->
         <div v-else-if="displayList.length > 0" class="course-grid">
           <div
               v-for="course in displayList"
               :key="course.courseNo"
               class="course-card"
-              @click="goToCourseDetail(course.courseNo)"
+              @click="goToCourseDetail(course)"
           >
             <div class="course-icon">📚</div>
             <div class="course-info">
@@ -69,56 +68,57 @@
 </template>
 
 <script setup>
-// 1. 必须定义 name，KeepAlive 才能缓存
 defineOptions({ name: 'CoursesView' })
 
-import { ref, onMounted, onActivated } from 'vue'
+import { ref, onMounted, onActivated, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { getRoleInfo } from '@/utils/role'
 
 const router = useRouter()
 
-// 状态
 const isLoggedIn = ref(false)
 const currentUsername = ref('')
+const currentRole = ref(1)
 const loading = ref(false)
 
-// 搜索数据
 const searchQuery = ref('')
 const allCourses = ref([])
 const displayList = ref([])
-
-// 2. 记录上一次的用户ID
 const lastUserId = ref(null)
 
-// --- 核心：状态检查 ---
+const roleName = computed(() => getRoleInfo(currentRole.value).label)
+const badgeStyle = computed(() => {
+  const info = getRoleInfo(currentRole.value)
+  return { color: info.color, backgroundColor: info.bgColor, borderColor: info.color }
+})
+
 function checkLoginStatus() {
   const token = localStorage.getItem('token')
   const username = localStorage.getItem('username')
   const uid = localStorage.getItem('userId')
+  const role = localStorage.getItem('role')
 
   if (token) {
     isLoggedIn.value = true
     currentUsername.value = username || '用户'
+    currentRole.value = parseInt(role || '1')
     return uid
   } else {
     isLoggedIn.value = false
     currentUsername.value = ''
+    currentRole.value = 1
     return null
   }
 }
 
-// 重置页面状态 (退出登录或换号时调用)
 function resetPageState() {
   console.log('CoursesView: 用户状态变化，重置页面...')
   searchQuery.value = ''
   allCourses.value = []
   displayList.value = []
-  // 重新拉取数据 (防止不同用户权限不同，或者纯粹为了清空缓存)
   fetchAllData()
 }
-
-// --- 生命周期 ---
 
 onMounted(async () => {
   const uid = checkLoginStatus()
@@ -126,19 +126,13 @@ onMounted(async () => {
   await fetchAllData()
 })
 
-// 3. onActivated: 每次切回页面时触发
 onActivated(() => {
   const currentUid = checkLoginStatus()
-
-  // 如果用户变了 (包括退出登录 null)，重置状态
   if (lastUserId.value !== currentUid) {
     resetPageState()
     lastUserId.value = currentUid
   }
-  // 如果用户没变，KeepAlive 会保持之前的 searchQuery 和 displayList
 })
-
-// --- 业务逻辑 ---
 
 async function fetchAllData() {
   loading.value = true
@@ -146,24 +140,17 @@ async function fetchAllData() {
     const res = await axios.get('/api/majors/all/courses')
     if (res.data && res.data.success) {
       allCourses.value = res.data.data || []
-      // 如果搜索框有值（缓存回来的），基于现有搜索词重新过滤一下；如果没值，显示全部
       handleLocalSearch()
     }
-  } catch (err) {
-    console.error("获取全量数据失败", err)
-  } finally {
-    loading.value = false
-  }
+  } catch (err) { console.error(err) } finally { loading.value = false }
 }
 
 function handleLocalSearch() {
   const keyword = searchQuery.value.trim().toLowerCase()
-
   if (!keyword) {
     displayList.value = allCourses.value
     return
   }
-
   displayList.value = allCourses.value.filter(course => {
     const nameMatch = course.courseName && course.courseName.toLowerCase().includes(keyword)
     const noMatch = course.courseNo && String(course.courseNo).toLowerCase().includes(keyword)
@@ -171,23 +158,27 @@ function handleLocalSearch() {
   })
 }
 
-const goToCourseDetail = (id) => router.push({ name: 'CourseDetail', params: { courseNo: id } })
+// 核心修改：确保传递 majorNo
+const goToCourseDetail = (course) => {
+  router.push({
+    name: 'CourseDetail',
+    params: { courseNo: course.courseNo },
+    query: { majorNo: course.majorNo }
+  })
+}
+
 const goToLogin = () => router.push('/login')
 const logout = () => {
   localStorage.clear()
-  isLoggedIn.value = false
-
-  // 退出时手动清空，防止 KeepAlive 保留脏数据
   resetPageState()
   lastUserId.value = null
-
+  isLoggedIn.value = false
   router.push('/login')
 }
 const goToPage = (path) => router.push(path)
 </script>
 
 <style scoped>
-/* 保持原有样式 */
 .home-container { height: 100vh; width: 100%; display: flex; background-color: #f5f7fa; }
 .sidebar { width: 220px; background-color: #001529; color: #fff; display: flex; flex-direction: column; padding: 20px 16px; flex-shrink: 0; }
 .logo { font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: center; color: #fff; }
@@ -201,10 +192,11 @@ const goToPage = (path) => router.push(path)
 .search-input-container { position: relative; width: 400px; max-width: 100%; }
 .search-input { width: 100%; padding: 10px 15px; border-radius: 4px; border: 1px solid #dcdfe6; outline: none; font-size: 14px; box-sizing: border-box; transition: border-color 0.2s; }
 .search-input:focus { border-color: #409eff; }
-.search-btn { flex-shrink: 0; padding: 10px 24px; border: none; border-radius: 4px; background-color: #409eff; color: #fff; cursor: pointer; font-size: 14px; font-weight: 500; transition: background-color 0.3s; height: 38px; display: flex; align-items: center; }
+.search-btn { flex-shrink: 0; padding: 10px 24px; border: none; border-radius: 4px; background-color: #409eff; color: #fff; cursor: pointer; font-size: 14px; font-weight: 500; transition: background-color 0.3s; height: 38px; display: flex; align-items: center; gap: 8px; }
 .search-btn:hover { background-color: #66b1ff; }
 .top-right { display: flex; align-items: center; justify-content: flex-end; min-width: 120px; }
 .welcome-user { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #606266; }
+.role-badge { font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid; font-weight: bold; }
 .nav-btn { padding: 8px 20px; font-size: 14px; background-color: #409eff; color: white; border: none; border-radius: 4px; cursor: pointer; }
 .logout-btn { padding: 5px 12px; cursor: pointer; border-radius: 4px; border: 1px solid #dcdfe6; background-color: #fff; font-size: 12px; color: #606266; }
 .logout-btn:hover { border-color: #c6e2ff; color: #409eff; }
@@ -216,7 +208,7 @@ const goToPage = (path) => router.push(path)
 .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
 .course-card { background: #fff; border-radius: 8px; padding: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
 .course-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1); }
-.course-icon { font-size: 24px; background: #f0f7ff; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.course-icon { font-size: 24px; background: #f0f7ff; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #409eff; }
 .course-info { display: flex; flex-direction: column; }
 .course-name { margin: 0 0 5px 0; font-size: 16px; color: #303133; font-weight: 600; }
 .course-no { margin: 0; font-size: 12px; color: #909399; }
