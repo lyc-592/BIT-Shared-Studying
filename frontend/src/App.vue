@@ -1,6 +1,11 @@
 <!-- src/App.vue -->
 <template>
-  <RouterView />
+  <router-view v-slot="{ Component }">
+    <!-- 仅缓存 HomeView，其他页面（如详情页、设置页）每次进入都刷新 -->
+    <keep-alive include="HomeView,CoursesView">
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
 </template>
 
 <script setup>
