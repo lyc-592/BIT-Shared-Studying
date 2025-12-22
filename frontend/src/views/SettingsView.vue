@@ -22,7 +22,6 @@
         </div>
       </div>
 
-      <!-- 游客拦截 -->
       <div v-if="!isLoggedIn" class="guest-state">
         <div class="guest-box">
           <h2>🚫 访问受限</h2>
@@ -31,14 +30,12 @@
         </div>
       </div>
 
-      <!-- 登录后内容 -->
       <div v-else>
         <div v-if="loading" class="loading-state">
           正在同步用户信息...
         </div>
 
         <div v-else>
-          <!-- 1. 个人资料卡片 -->
           <div class="profile-card">
             <h3 class="card-title">基本资料</h3>
             <div class="form-body">
@@ -83,7 +80,6 @@
             </div>
           </div>
 
-          <!-- 2. 管理员授权控制台 (Role >= 3) -->
           <div v-if="userRole >= 3" class="admin-panel">
             <h3 class="card-title admin-title">管理员授权中心</h3>
             <p class="admin-desc">
@@ -93,7 +89,6 @@
             </p>
 
             <div class="admin-actions">
-              <!-- 授权表单 -->
               <div class="admin-form-box">
                 <h4>授予权限</h4>
                 <div class="form-group">
@@ -123,7 +118,6 @@
                 <button class="btn-grant" @click="handleGrant">确认授权</button>
               </div>
 
-              <!-- 撤销表单 -->
               <div class="admin-form-box revoke-box">
                 <h4>剥夺权限</h4>
                 <div class="form-group">
@@ -187,12 +181,13 @@ const roleBadgeStyle = computed(() => {
 })
 
 async function initData() {
-  const token = localStorage.getItem('token')
-  const uid = localStorage.getItem('userId')
-  const role = localStorage.getItem('role')
+  // 修改点：sessionStorage
+  const token = sessionStorage.getItem('token')
+  const uid = sessionStorage.getItem('userId')
+  const role = sessionStorage.getItem('role')
 
-  localUsername.value = localStorage.getItem('username') || ''
-  localEmail.value = localStorage.getItem('email') || ''
+  localUsername.value = sessionStorage.getItem('username') || ''
+  localEmail.value = sessionStorage.getItem('email') || ''
 
   if (!token || !uid) {
     isLoggedIn.value = false
@@ -238,6 +233,12 @@ async function loadProfile() {
     form.bio = data.bio || ''
     form.major = data.major || ''
     form.role = data.role
+
+    if (data.role && parseInt(data.role) !== userRole.value) {
+      userRole.value = parseInt(data.role)
+      sessionStorage.setItem('role', data.role)
+      if (userRole.value < 2) sessionStorage.removeItem('auth_major_no')
+    }
   }
 }
 
@@ -322,7 +323,7 @@ async function handleRevoke() {
 
 function handleLogout() {
   if (confirm('确定要退出登录吗？')) {
-    localStorage.clear()
+    sessionStorage.clear() // 修改点
     isLoggedIn.value = false
     router.push('/login')
   }

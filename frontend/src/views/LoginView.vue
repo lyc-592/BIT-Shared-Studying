@@ -68,20 +68,34 @@ const handleLogin = async () => {
     if (body.success) {
       // 1. Token
       const token = body.token || body.data?.token || 'session-token-placeholder'
-      localStorage.setItem('token', token)
+      // 修改点：使用 sessionStorage
+      sessionStorage.setItem('token', token)
 
       // 2. User Info
       const data = body.data || {}
       const uid = data.id || data.userId || body.userId
 
       if (uid) {
-        localStorage.setItem('userId', uid)
-        if (data.username) localStorage.setItem('username', data.username)
-        if (data.email) localStorage.setItem('email', data.email)
+        sessionStorage.setItem('userId', uid)
+
+        if (data.username) sessionStorage.setItem('username', data.username)
+        if (data.email) sessionStorage.setItem('email', data.email)
 
         // 3. Role
         const role = data.role || '1'
-        localStorage.setItem('role', role)
+        sessionStorage.setItem('role', role)
+
+        // 4. MajorNo (专业管理员)
+        if (parseInt(role) === 2) {
+          const userMajor = data.majorNo || data.major_no || data.majorId
+          if (userMajor) {
+            sessionStorage.setItem('auth_major_no', userMajor)
+          } else {
+            sessionStorage.removeItem('auth_major_no')
+          }
+        } else {
+          sessionStorage.removeItem('auth_major_no')
+        }
 
         alert('登录成功！')
         router.push('/')
@@ -105,6 +119,7 @@ const goToHome = () => router.push('/')
 </script>
 
 <style scoped>
+/* 样式不变 */
 .auth-container { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #eef1f6; position: relative; }
 .back-home-btn { position: absolute; top: 30px; left: 30px; padding: 10px 20px; background: white; border: 1px solid #dcdfe6; cursor: pointer; border-radius: 4px; color: #606266; display: flex; align-items: center; gap: 8px; transition: all 0.3s; }
 .back-home-btn:hover { color: #409eff; border-color: #c6e2ff; }

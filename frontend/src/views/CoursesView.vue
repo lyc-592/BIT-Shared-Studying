@@ -94,10 +94,11 @@ const badgeStyle = computed(() => {
 })
 
 function checkLoginStatus() {
-  const token = localStorage.getItem('token')
-  const username = localStorage.getItem('username')
-  const uid = localStorage.getItem('userId')
-  const role = localStorage.getItem('role')
+  // 修改点：sessionStorage
+  const token = sessionStorage.getItem('token')
+  const username = sessionStorage.getItem('username')
+  const uid = sessionStorage.getItem('userId')
+  const role = sessionStorage.getItem('role')
 
   if (token) {
     isLoggedIn.value = true
@@ -112,8 +113,25 @@ function checkLoginStatus() {
   }
 }
 
+async function syncUserRole() {
+  const uid = sessionStorage.getItem('userId')
+  if (!uid) return
+  try {
+    const res = await axios.get(`/api/profile/${uid}`)
+    const data = res.data.data || res.data
+    if (data && data.role !== undefined) {
+      const remoteRole = parseInt(data.role)
+      const localRole = currentRole.value
+      if (remoteRole !== localRole) {
+        currentRole.value = remoteRole
+        sessionStorage.setItem('role', remoteRole)
+        if (remoteRole < 2) sessionStorage.removeItem('auth_major_no')
+      }
+    }
+  } catch (e) { /* ignore */ }
+}
+
 function resetPageState() {
-  console.log('CoursesView: 用户状态变化，重置页面...')
   searchQuery.value = ''
   allCourses.value = []
   displayList.value = []
@@ -123,15 +141,17 @@ function resetPageState() {
 onMounted(async () => {
   const uid = checkLoginStatus()
   lastUserId.value = uid
+  if (uid) await syncUserRole()
   await fetchAllData()
 })
 
-onActivated(() => {
+onActivated(async () => {
   const currentUid = checkLoginStatus()
   if (lastUserId.value !== currentUid) {
     resetPageState()
     lastUserId.value = currentUid
   }
+  if (currentUid) await syncUserRole()
 })
 
 async function fetchAllData() {
@@ -158,7 +178,6 @@ function handleLocalSearch() {
   })
 }
 
-// 核心修改：确保传递 majorNo
 const goToCourseDetail = (course) => {
   router.push({
     name: 'CourseDetail',
@@ -169,7 +188,7 @@ const goToCourseDetail = (course) => {
 
 const goToLogin = () => router.push('/login')
 const logout = () => {
-  localStorage.clear()
+  sessionStorage.clear() // 修改点
   resetPageState()
   lastUserId.value = null
   isLoggedIn.value = false
@@ -179,6 +198,7 @@ const goToPage = (path) => router.push(path)
 </script>
 
 <style scoped>
+/* 样式不变 */
 .home-container { height: 100vh; width: 100%; display: flex; background-color: #f5f7fa; }
 .sidebar { width: 220px; background-color: #001529; color: #fff; display: flex; flex-direction: column; padding: 20px 16px; flex-shrink: 0; }
 .logo { font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: center; color: #fff; }

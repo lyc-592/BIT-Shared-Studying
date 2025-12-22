@@ -87,7 +87,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
@@ -96,10 +96,10 @@ const courseNo = route.params.courseNo
 const currentPath = route.query.path
 const folderName = route.query.folderName || '文件夹内容'
 
-// 权限相关
+// 权限相关 (修改点：使用 sessionStorage)
 const canEdit = ref(false)
-const userRole = parseInt(localStorage.getItem('role') || '1')
-const userId = localStorage.getItem('userId')
+const userRole = parseInt(sessionStorage.getItem('role') || '1')
+const userId = sessionStorage.getItem('userId')
 
 const files = ref([])
 const loading = ref(true)
