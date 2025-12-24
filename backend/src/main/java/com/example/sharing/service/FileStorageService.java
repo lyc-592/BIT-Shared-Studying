@@ -1,6 +1,7 @@
 package com.example.sharing.service;
 
 import com.example.sharing.dto.ApiResponse;
+import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ import java.util.zip.ZipOutputStream;
 public class FileStorageService {
 
     // ============ 内部类 ============
-
+    @Data
     public static class FileInfo {
         private String name;              // 文件名
         private String path;              // 相对路径
@@ -35,31 +36,6 @@ public class FileStorageService {
         private long lastModified;       // 最后修改时间
         private String extension;        // 文件扩展名
         private String contentType;      // 文件类型
-
-        // Getters and Setters
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-
-        public String getPath() { return path; }
-        public void setPath(String path) { this.path = path; }
-
-        public String getFullPath() { return fullPath; }
-        public void setFullPath(String fullPath) { this.fullPath = fullPath; }
-
-        public long getSize() { return size; }
-        public void setSize(long size) { this.size = size; }
-
-        public String getSizeFormatted() { return sizeFormatted; }
-        public void setSizeFormatted(String sizeFormatted) { this.sizeFormatted = sizeFormatted; }
-
-        public long getLastModified() { return lastModified; }
-        public void setLastModified(long lastModified) { this.lastModified = lastModified; }
-
-        public String getExtension() { return extension; }
-        public void setExtension(String extension) { this.extension = extension; }
-
-        public String getContentType() { return contentType; }
-        public void setContentType(String contentType) { this.contentType = contentType; }
     }
 
     @Value("${file.storage.base-path}")
@@ -105,7 +81,6 @@ public class FileStorageService {
             return ApiResponse.fail("文件保存失败：" + e.getMessage());
         }
     }
-
 
     /**
      * 创建目录
@@ -395,12 +370,21 @@ public class FileStorageService {
         }
     }
 
+    public boolean exists(String relativePath) {
+        try {
+            Path filePath = getFullPath(relativePath);
+            return Files.exists(filePath);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     // ============ 私有辅助方法 ============
 
     /**
      * 将相对路径转换为完整路径，并进行安全检查
      */
-    @org.jetbrains.annotations.NotNull
+    @NotNull
     private Path getFullPath(String relativePath) throws InvalidPathException {
         // 清理路径，防止路径遍历攻击
         String cleanPath = sanitizePath(relativePath);

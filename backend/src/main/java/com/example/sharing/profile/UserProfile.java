@@ -1,4 +1,4 @@
-package com.example.sharing.Profile;
+package com.example.sharing.profile;
 
 import com.example.sharing.entity.User;
 import jakarta.persistence.*;

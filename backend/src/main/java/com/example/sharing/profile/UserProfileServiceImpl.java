@@ -1,7 +1,6 @@
-package com.example.sharing.Profile;
+package com.example.sharing.profile;
 
 import com.example.sharing.entity.User;
-import com.example.sharing.Profile.UserProfileRepository;
 import com.example.sharing.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
