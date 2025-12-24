@@ -62,6 +62,29 @@ const router = createRouter({
             path: '/settings',
             name: 'Settings',
             component: SettingsView
+        },
+        {
+            path: '/course/:courseNo/forum',
+            name: 'CourseForum',
+            component: () => import('@/views/CourseForumView.vue'), // 对应我上个回复给你的论坛主页
+            props: true
+        },
+        {
+            path: '/topic/:topicId',
+            name: 'TopicDetail',
+            component: () => import('@/views/TopicDetailView.vue'), // 对应话题详情页
+            props: true
+        },
+        {
+            path: '/course/:courseNo/forum/post',
+            name: 'TopicPost',
+            component: () => import('@/views/TopicPostView.vue'), // 对应发帖页
+            props: true
+        },
+        {
+            path: '/inbox',
+            name: 'Inbox',
+            component: () => import('@/views/InboxView.vue')
         }
     ]
 })

@@ -5,6 +5,7 @@
       <nav class="nav-menu">
         <button class="nav-item" @click="goToPage('/')">首页</button>
         <button class="nav-item active" @click="goToPage('/courses')">课程</button>
+        <button class="nav-item" @click="goToPage('/inbox')">信箱</button>
         <button class="nav-item" @click="goToPage('/settings')">设置</button>
       </nav>
     </aside>
@@ -27,7 +28,16 @@
         <div class="top-right">
           <button v-if="!isLoggedIn" @click="goToLogin" class="nav-btn">登录 / 注册</button>
           <div v-else class="welcome-user">
-            <span class="role-badge" :style="badgeStyle">{{ roleName }}</span>
+            <span
+                class="role-badge"
+                :style="{
+                color: getRoleInfo(currentRole).color,
+                backgroundColor: getRoleInfo(currentRole).bgColor,
+                borderColor: getRoleInfo(currentRole).color
+              }"
+            >
+              {{ getRoleInfo(currentRole).label }}
+            </span>
             <span class="welcome-text">{{ currentUsername }}</span>
             <button @click="logout" class="logout-btn">退出</button>
           </div>
@@ -41,14 +51,16 @@
           <span class="count-badge">({{ displayList.length }})</span>
         </h2>
 
+        <!-- 加载动画 -->
         <div v-if="loading" class="loading-state">数据同步中...</div>
 
+        <!-- 课程列表 -->
         <div v-else-if="displayList.length > 0" class="course-grid">
           <div
               v-for="course in displayList"
               :key="course.courseNo"
               class="course-card"
-              @click="goToCourseDetail(course)"
+              @click="goToCourseDetail(course.courseNo)"
           >
             <div class="course-icon">📚</div>
             <div class="course-info">
@@ -70,13 +82,14 @@
 <script setup>
 defineOptions({ name: 'CoursesView' })
 
-import { ref, onMounted, onActivated, computed } from 'vue'
+import { ref, onMounted, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { getRoleInfo } from '@/utils/role'
 
 const router = useRouter()
 
+// 状态
 const isLoggedIn = ref(false)
 const currentUsername = ref('')
 const currentRole = ref(1)
@@ -87,18 +100,11 @@ const allCourses = ref([])
 const displayList = ref([])
 const lastUserId = ref(null)
 
-const roleName = computed(() => getRoleInfo(currentRole.value).label)
-const badgeStyle = computed(() => {
-  const info = getRoleInfo(currentRole.value)
-  return { color: info.color, backgroundColor: info.bgColor, borderColor: info.color }
-})
-
 function checkLoginStatus() {
-  // 修改点：sessionStorage
-  const token = sessionStorage.getItem('token')
-  const username = sessionStorage.getItem('username')
-  const uid = sessionStorage.getItem('userId')
-  const role = sessionStorage.getItem('role')
+  const token = localStorage.getItem('token')
+  const username = localStorage.getItem('username')
+  const uid = localStorage.getItem('userId')
+  const role = localStorage.getItem('role')
 
   if (token) {
     isLoggedIn.value = true
@@ -113,25 +119,8 @@ function checkLoginStatus() {
   }
 }
 
-async function syncUserRole() {
-  const uid = sessionStorage.getItem('userId')
-  if (!uid) return
-  try {
-    const res = await axios.get(`/api/profile/${uid}`)
-    const data = res.data.data || res.data
-    if (data && data.role !== undefined) {
-      const remoteRole = parseInt(data.role)
-      const localRole = currentRole.value
-      if (remoteRole !== localRole) {
-        currentRole.value = remoteRole
-        sessionStorage.setItem('role', remoteRole)
-        if (remoteRole < 2) sessionStorage.removeItem('auth_major_no')
-      }
-    }
-  } catch (e) { /* ignore */ }
-}
-
 function resetPageState() {
+  console.log('CoursesView: 用户状态变化，重置页面...')
   searchQuery.value = ''
   allCourses.value = []
   displayList.value = []
@@ -141,22 +130,22 @@ function resetPageState() {
 onMounted(async () => {
   const uid = checkLoginStatus()
   lastUserId.value = uid
-  if (uid) await syncUserRole()
   await fetchAllData()
 })
 
-onActivated(async () => {
+onActivated(() => {
   const currentUid = checkLoginStatus()
   if (lastUserId.value !== currentUid) {
     resetPageState()
     lastUserId.value = currentUid
   }
-  if (currentUid) await syncUserRole()
 })
 
+// --- 核心修改：API 路径更改 ---
 async function fetchAllData() {
   loading.value = true
   try {
+    // 按照要求改为 /api/majors/all/courses
     const res = await axios.get('/api/majors/all/courses')
     if (res.data && res.data.success) {
       allCourses.value = res.data.data || []
@@ -178,17 +167,10 @@ function handleLocalSearch() {
   })
 }
 
-const goToCourseDetail = (course) => {
-  router.push({
-    name: 'CourseDetail',
-    params: { courseNo: course.courseNo },
-    query: { majorNo: course.majorNo }
-  })
-}
-
+const goToCourseDetail = (id) => router.push({ name: 'CourseDetail', params: { courseNo: id } })
 const goToLogin = () => router.push('/login')
 const logout = () => {
-  sessionStorage.clear() // 修改点
+  localStorage.clear()
   resetPageState()
   lastUserId.value = null
   isLoggedIn.value = false
@@ -198,7 +180,7 @@ const goToPage = (path) => router.push(path)
 </script>
 
 <style scoped>
-/* 样式不变 */
+/* 保持原有样式，与 HomeView 风格一致 */
 .home-container { height: 100vh; width: 100%; display: flex; background-color: #f5f7fa; }
 .sidebar { width: 220px; background-color: #001529; color: #fff; display: flex; flex-direction: column; padding: 20px 16px; flex-shrink: 0; }
 .logo { font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: center; color: #fff; }

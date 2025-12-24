@@ -23,6 +23,22 @@
       </div>
     </div>
 
+    <!-- 添加：针对普通用户（无canEdit权限）展示的“申请上传”区域 -->
+    <div class="upload-section request-section" v-if="!canEdit">
+      <span class="section-label">申请上传文件：</span>
+      <div class="upload-controls">
+        <input type="file" @change="handleRequestFileSelect" class="file-input" />
+        <input v-model="requestRemark" placeholder="填写申请备注（必填）..." class="remark-input" />
+        <button
+            class="upload-btn request-btn"
+            @click="handleRequestUpload"
+            :disabled="!requestFile || isRequesting"
+        >
+          {{ isRequesting ? '提交中...' : '提交申请' }}
+        </button>
+      </div>
+    </div>
+
     <div v-if="files.length > 0" class="batch-bar">
       <div class="batch-left">
         <label class="select-all-label">
@@ -75,6 +91,10 @@
             <button class="action-btn download-btn" @click="handleDownload(file)">
               ⬇️ 下载
             </button>
+            <!-- 添加：针对单个文件的讨论按钮 -->
+            <button class="action-btn discuss-btn" @click="goToDiscuss(file)">
+              💬 讨论
+            </button>
             <!-- 删除按钮：使用 canEdit 严格控制 -->
             <button v-if="canEdit" class="action-btn delete-btn" @click="handleDeleteFile(file)">
               🗑️ 删除
@@ -88,10 +108,11 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router' // 添加：引入 useRouter
 import axios from 'axios'
 
 const route = useRoute()
+const router = useRouter() // 添加：初始化 router
 const courseNo = route.params.courseNo
 const currentPath = route.query.path
 const folderName = route.query.folderName || '文件夹内容'
@@ -108,10 +129,34 @@ const isUploading = ref(false)
 const folderFileInputRef = ref(null)
 const selectedPaths = ref([])
 
+// 添加：“文件上传申请”所需响应式变量
+const requestFile = ref(null)
+const requestRemark = ref('')
+const isRequesting = ref(false)
+
 onMounted(async () => {
   // 并行检查权限和加载文件
   await Promise.all([loadFolderContent(), checkPermission()])
 })
+
+// 添加：跳转到发帖页面并携带 referencePath
+function goToDiscuss(file) {
+  const filePath = getFullFilePath(file.name)
+  // 先获取论坛信息以确保能拿到正确的 forumNo 传给发帖页
+  axios.get(`/api/forums/by-course/${courseNo}`).then(res => {
+    if (res.data.success) {
+      router.push({
+        name: 'TopicPost',
+        params: { courseNo: courseNo },
+        query: {
+          forumNo: res.data.data.forumNo,
+          referencePath: filePath,
+          fileName: file.name
+        }
+      })
+    }
+  })
+}
 
 // --- 权限检查 ---
 async function checkPermission() {
@@ -148,7 +193,7 @@ function getFileIcon(filename) {
     case 'doc': case 'docx': return '📝'
     case 'jpg': case 'jpeg': case 'png': case 'gif': case 'bmp': case 'svg': case 'webp': return '🖼️'
     case 'mp4': case 'avi': case 'mov': case 'mkv': case 'webm': return '🎬'
-    case 'zip': case 'rar': case '7z': return '📦'
+    case 'zip': case 'rar': case 'tar': case '7z': return '📦'
     default: return '📄'
   }
 }
@@ -286,6 +331,48 @@ async function handleFolderUpload() {
     isUploading.value = false
   }
 }
+
+// 添加：申请上传的相关处理逻辑
+function handleRequestFileSelect(event) {
+  requestFile.value = event.target.files[0]
+}
+
+async function handleRequestUpload() {
+  if (!requestFile.value) {
+    alert('请选择要上传的文件')
+    return
+  }
+  if (!requestRemark.value.trim()) {
+    alert('请填写申请备注')
+    return
+  }
+
+  isRequesting.value = true
+  const formData = new FormData()
+  formData.append('requesterId', userId)
+  formData.append('courseNo', courseNo)
+  formData.append('file', requestFile.value)
+  formData.append('remark', requestRemark.value)
+  formData.append('targetAbsolutePath', "/root/sharing_files/" + currentPath)
+
+  try {
+    const res = await axios.post('/api/file-upload-requests/submit', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    if (res.data.success) {
+      alert('上传申请已提交，等待管理员审核')
+      requestFile.value = null
+      requestRemark.value = ''
+      // 清空文件 input (如果是通过 e.target.files 拿到的话通常需要手动清空 DOM 或刷新状态)
+    } else {
+      alert('申请失败: ' + res.data.message)
+    }
+  } catch (err) {
+    alert('请求失败: ' + err.message)
+  } finally {
+    isRequesting.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -317,6 +404,15 @@ async function handleFolderUpload() {
 .action-btn { font-size: 13px; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; width: 100%; }
 .preview-btn { background-color: #e6a23c; color: white; }
 .download-btn { background-color: #409eff; color: white; }
+
+/* 添加：申请上传按钮及输入框样式 */
+.request-section { border: 1px solid #e6a23c; background-color: #fdf6ec; }
+.remark-input { padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px; width: 250px; }
+.request-btn { background-color: #e6a23c; }
+.request-btn:hover { background-color: #ebb563; }
+
+.discuss-btn { background-color: #67c23a; color: white; }
+.discuss-btn:hover { background-color: #85ce61; }
 .delete-btn { background-color: #f56c6c; color: white; }
 .loading { text-align: center; color: #909399; padding-top: 50px; }
 </style>

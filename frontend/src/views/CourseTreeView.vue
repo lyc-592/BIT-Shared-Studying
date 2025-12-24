@@ -2,6 +2,7 @@
   <div class="tree-container">
     <div class="header">
       <button class="nav-btn" @click="$router.push('/')">返回首页</button>
+      <button class="nav-btn forum-nav-btn" @click="goToForum">💬 课程论坛</button>
       <h3>课程资源结构图 ({{ courseNo }})</h3>
       <span class="tip">提示：滚轮缩放，左键拖动，点击节点操作</span>
     </div>
@@ -59,6 +60,12 @@ const courseNo = route.params.courseNo
 const canEdit = ref(false)
 const userRole = parseInt(sessionStorage.getItem('role') || '1')
 const userId = sessionStorage.getItem('userId')
+const goToForum = () => {
+  router.push({
+    name: 'CourseForum',
+    params: { courseNo: courseNo }
+  })
+}
 
 const chartRef = ref(null)
 let myChart = null
@@ -254,4 +261,14 @@ button:hover { opacity: 0.9; }
 .confirm-btn { background: #409eff; color: white; border: none; flex: 1; }
 .cancel-btn { background: #909399; color: white; border: none; flex: 1; }
 .close-btn { position: absolute; top: 5px; right: 8px; border: none; background: transparent; font-size: 18px; color: #999; }
+.forum-nav-btn {
+  background-color: #f0f9eb !important;
+  color: #67c23a !important;
+  border-color: #c2e7b0 !important;
+  font-weight: bold;
+}
+.forum-nav-btn:hover {
+  background-color: #67c23a !important;
+  color: #fff !important;
+}
 </style>

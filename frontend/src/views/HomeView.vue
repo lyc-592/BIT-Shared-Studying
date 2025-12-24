@@ -5,7 +5,9 @@
       <nav class="nav-menu">
         <button class="nav-item active" @click="goToPage('/')">首页</button>
         <button class="nav-item" @click="goToPage('/courses')">课程</button>
+        <button class="nav-item" @click="goToPage('/inbox')">信箱</button>
         <button class="nav-item" @click="goToPage('/settings')">设置</button>
+
       </nav>
     </aside>
 

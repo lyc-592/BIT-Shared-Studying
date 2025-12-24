@@ -12,6 +12,12 @@
         <h3>当前课程号: {{ courseNo }}</h3>
         <p>这里将通过 API 根据课程号加载该课程的详细资料...</p>
         <!-- 以后在这里写 axios.get(`/api/courses/${courseNo}`) -->
+
+        <!-- 添加：进入论坛的入口 -->
+        <div class="forum-section">
+          <p class="forum-tip">对课程有疑问或想法？点击下方按钮进入交流社区</p>
+          <button @click="goToForum" class="forum-btn">💬 进入课程论坛</button>
+        </div>
       </div>
     </div>
   </div>
@@ -29,6 +35,14 @@ const courseNo = ref(route.params.courseNo)
 
 const goBack = () => {
   router.back() // 这样返回时，配合 KeepAlive 就能保留上一页的搜索结果
+}
+
+// 添加：跳转到论坛页面的方法
+const goToForum = () => {
+  router.push({
+    name: 'CourseForum',
+    params: { courseNo: courseNo.value }
+  })
 }
 
 onMounted(() => {
@@ -61,5 +75,32 @@ onMounted(() => {
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+/* 添加：论坛入口样式 */
+.forum-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px dashed #dcdfe6;
+  text-align: center;
+}
+.forum-tip {
+  color: #909399;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+.forum-btn {
+  padding: 10px 24px;
+  background-color: #409eff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.forum-btn:hover {
+  background-color: #66b1ff;
 }
 </style>
