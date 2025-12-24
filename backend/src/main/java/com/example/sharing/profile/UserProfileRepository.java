@@ -1,4 +1,4 @@
-package com.example.sharing.Profile;
+package com.example.sharing.profile;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

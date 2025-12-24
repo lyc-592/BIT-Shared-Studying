@@ -4,6 +4,7 @@ package com.example.sharing.role;
 import com.example.sharing.entity.Course;
 import com.example.sharing.entity.User;
 import jakarta.persistence.*;
+import lombok.Setter;
 
 @Entity
 @Table(
@@ -17,11 +18,13 @@ public class UserCoursePermission {
     private Long id;
 
     // 对应 user 表
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     // 对应 course 表，主键是 course_no
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_no", referencedColumnName = "course_no", nullable = false)
     private Course course;
@@ -34,15 +37,8 @@ public class UserCoursePermission {
         return user;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public Course getCourse() {
         return course;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
-    }
 }

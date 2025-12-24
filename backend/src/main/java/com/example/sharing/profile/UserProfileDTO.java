@@ -1,4 +1,4 @@
-package com.example.sharing.Profile;
+package com.example.sharing.profile;
 
 
 public class UserProfileDTO {

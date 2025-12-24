@@ -30,3 +30,5 @@ file:
     base-path: /root/sharing_files
 #    base-path: "E:\\JavaProfile\\test_file_route"
 #    base-path: "D:\\myfiles"
+    attachment-path: /root/attachment
+#    attachment-path: "E:\\JavaProfile\\test_file_route\\uploads"
