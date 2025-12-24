@@ -12,13 +12,13 @@
       <div class="modal-title">{{ selectedNode.name }}</div>
 
       <div class="btn-group" v-if="!showCreateInput && !showUploadInput">
-        <button class="btn-primary" @click="handleOpenFolder">打开文件夹</button>
+        <button class="btn-primary" @click="handleOpenFolder">📂打开文件夹</button>
 
         <!-- 使用 canEdit 状态控制显示 -->
         <template v-if="canEdit">
-          <button class="btn-warning" @click="showUploadInput = true">上传文件</button>
-          <button class="btn-success" @click="showCreateInput = true">新建子文件夹</button>
-          <button class="btn-danger" @click="handleDeleteNode">删除此节点</button>
+          <button class="btn-warning" @click="showUploadInput = true">⬆️上传文件</button>
+          <button class="btn-success" @click="showCreateInput = true">➕新建子文件夹</button>
+          <button class="btn-danger" @click="handleDeleteNode">🗑️删除此节点</button>
         </template>
       </div>
 
@@ -55,10 +55,10 @@ const route = useRoute()
 const router = useRouter()
 const courseNo = route.params.courseNo
 
-// 权限状态
+// 权限状态 (修改点：使用 sessionStorage)
 const canEdit = ref(false)
-const userRole = parseInt(localStorage.getItem('role') || '1')
-const userId = localStorage.getItem('userId')
+const userRole = parseInt(sessionStorage.getItem('role') || '1')
+const userId = sessionStorage.getItem('userId')
 
 const chartRef = ref(null)
 let myChart = null
@@ -84,7 +84,7 @@ onUnmounted(() => {
   if (myChart) myChart.dispose()
 })
 
-// --- 核心修改：权限检查 ---
+// --- 权限检查 ---
 async function checkPermission() {
   // 1. 角色判断
   if (userRole >= 3) {

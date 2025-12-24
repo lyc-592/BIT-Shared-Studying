@@ -41,16 +41,7 @@
             登录 / 注册
           </button>
           <div v-else class="welcome-user">
-            <span
-                class="role-badge"
-                :style="{
-                color: getRoleInfo(currentRole).color,
-                backgroundColor: getRoleInfo(currentRole).bgColor,
-                borderColor: getRoleInfo(currentRole).color
-              }"
-            >
-              {{ getRoleInfo(currentRole).label }}
-            </span>
+            <span class="role-badge" :style="badgeStyle">{{ roleName }}</span>
             <span class="welcome-text">{{ currentUsername }}</span>
             <button @click="logout" class="logout-btn">退出</button>
           </div>
@@ -94,7 +85,7 @@
 <script setup>
 defineOptions({ name: 'HomeView' })
 
-import { ref, onMounted, onActivated } from 'vue'
+import { ref, onMounted, onActivated, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { getRoleInfo } from '@/utils/role'
@@ -117,11 +108,18 @@ const selectedMajorName = ref('')
 const hasSearched = ref(false)
 const lastUserId = ref(null)
 
+const roleName = computed(() => getRoleInfo(currentRole.value).label)
+const badgeStyle = computed(() => {
+  const info = getRoleInfo(currentRole.value)
+  return { color: info.color, backgroundColor: info.bgColor, borderColor: info.color }
+})
+
 function checkLoginStatus() {
-  const token = localStorage.getItem('token')
-  const username = localStorage.getItem('username')
-  const uid = localStorage.getItem('userId')
-  const role = localStorage.getItem('role')
+  // 修改点：使用 sessionStorage
+  const token = sessionStorage.getItem('token')
+  const username = sessionStorage.getItem('username')
+  const uid = sessionStorage.getItem('userId')
+  const role = sessionStorage.getItem('role')
 
   if (token) {
     isLoggedIn.value = true
@@ -134,6 +132,25 @@ function checkLoginStatus() {
     currentRole.value = 1
     return null
   }
+}
+
+// 同步权限
+async function syncUserRole() {
+  const uid = sessionStorage.getItem('userId')
+  if (!uid) return
+  try {
+    const res = await axios.get(`/api/profile/${uid}`)
+    const data = res.data.data || res.data
+    if (data && data.role !== undefined) {
+      const remoteRole = parseInt(data.role)
+      const localRole = currentRole.value
+      if (remoteRole !== localRole) {
+        currentRole.value = remoteRole
+        sessionStorage.setItem('role', remoteRole)
+        if (remoteRole < 2) sessionStorage.removeItem('auth_major_no')
+      }
+    }
+  } catch (e) { /* ignore */ }
 }
 
 function resetSearchState() {
@@ -149,15 +166,17 @@ function resetSearchState() {
 onMounted(async () => {
   const uid = checkLoginStatus()
   lastUserId.value = uid
+  if (uid) await syncUserRole()
   await loadAllMajors()
 })
 
-onActivated(() => {
+onActivated(async () => {
   const currentUid = checkLoginStatus()
   if (lastUserId.value !== currentUid) {
     resetSearchState()
     lastUserId.value = currentUid
   }
+  if (currentUid) await syncUserRole()
 })
 
 async function loadAllMajors() {
@@ -216,7 +235,7 @@ async function handleSearch() {
 
 const goToLogin = () => router.push('/login')
 const logout = () => {
-  localStorage.clear()
+  sessionStorage.clear() // 修改点
   resetSearchState()
   lastUserId.value = null
   isLoggedIn.value = false
@@ -224,17 +243,18 @@ const logout = () => {
 }
 const goToPage = (path) => router.push(path)
 
-// 修正：不再需要传递 majorNo
 const goToCourseDetail = (id) => {
+  if (!currentSelectedMajor.value) return
   router.push({
     name: 'CourseDetail',
-    params: { courseNo: id }
+    params: { courseNo: id },
+    query: { majorNo: currentSelectedMajor.value.majorNo }
   })
 }
 </script>
 
 <style scoped>
-/* 保持原有样式，省略以复用 */
+/* 样式不变 */
 .home-container { height: 100vh; width: 100%; display: flex; background-color: #f5f7fa; }
 .sidebar { width: 220px; background-color: #001529; color: #fff; display: flex; flex-direction: column; padding: 20px 16px; flex-shrink: 0; }
 .logo { font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: center; color: #fff; }
@@ -264,7 +284,9 @@ const goToCourseDetail = (id) => {
 .info-banner { border: 1px solid #e1f3d8; background-color: #f0f9eb; color: #67c23a; }
 .content-body { flex: 1; display: flex; flex-direction: column; }
 .section-title { font-size: 18px; color: #303133; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid #409eff; display: flex; align-items: center; gap: 10px; }
+.count-badge { font-size: 14px; color: #909399; font-weight: normal; }
 .empty-state { text-align: center; color: #909399; margin-top: 50px; font-size: 16px; }
+.loading-state { text-align: center; color: #909399; margin-top: 30px; font-size: 14px; }
 .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
 .course-card { background: #fff; border-radius: 8px; padding: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
 .course-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1); }
@@ -272,4 +294,5 @@ const goToCourseDetail = (id) => {
 .course-info { display: flex; flex-direction: column; }
 .course-name { margin: 0 0 5px 0; font-size: 16px; color: #303133; font-weight: 600; }
 .course-no { margin: 0; font-size: 12px; color: #909399; }
+.course-dept { margin: 2px 0 0 0; font-size: 12px; color: #409eff; background: #ecf5ff; padding: 2px 6px; border-radius: 4px; display: inline-block; width: fit-content;}
 </style>
