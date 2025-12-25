@@ -20,7 +20,10 @@
           <span class="sub-title">收纳您的申请记录与系统通知</span>
         </div>
         <div class="header-right">
-          <button class="btn-apply-admin" @click="showApplyModal = true">申请成为管理员</button>
+          <!-- 修改点：仅当 role 为 1 (普通用户) 时显示申请按钮 -->
+          <button v-if="userRole === 1" class="btn-apply-admin" @click="showApplyModal = true">
+            申请成为管理员
+          </button>
         </div>
       </div>
 
@@ -86,6 +89,25 @@
                   <p><strong>文件名：</strong>{{ detail.fileUploadRequest.originalFilename }}</p>
                   <p><strong>课程号：</strong>{{ detail.fileUploadRequest.courseNo }}</p>
                 </div>
+
+                <!-- AI 核查结果区域 -->
+                <div class="ai-audit-results">
+                  <p class="ai-title">🤖 AI 智能核查结果：</p>
+                  <div class="ai-content">
+                    <template v-if="!detail.fileUploadRequest.aiSuggestAction">
+                      <span class="ai-failed">AI调用失败</span>
+                    </template>
+                    <template v-else>
+                      <span :class="['ai-badge', detail.fileUploadRequest.aiSuggestAction]">
+                        {{ detail.fileUploadRequest.aiSuggestAction === 'manual_review' ? 'AI只读取了文件目录并未读取文件内容' : 'AI已阅读文件内容并做出判断' }}
+                      </span>
+                      <p v-if="detail.fileUploadRequest.aiSuggestReason" class="ai-reason">
+                        <strong>理由：</strong>{{ detail.fileUploadRequest.aiSuggestReason }}
+                      </p>
+                    </template>
+                  </div>
+                </div>
+
                 <div class="button-group">
                   <button class="btn-action preview" @click="previewFile(detail.fileUploadRequest.id)">👁️ 预览文件</button>
                   <button class="btn-action download" @click="downloadFile(detail.fileUploadRequest.id)">⬇️ 下载</button>
@@ -98,7 +120,7 @@
                 </div>
               </div>
 
-              <!-- 类型 3：普通结果通知 (FILE_UPLOAD_RESULT) -->
+              <!-- 类型 3：结果通知 -->
               <div v-if="detail.message.type === 'FILE_UPLOAD_RESULT'" class="action-box result-info">
                 <p v-if="detail.fileUploadRequest && detail.fileUploadRequest.status === 'REJECTED'" class="reject-reason">
                   <strong>拒绝原因：</strong>{{ detail.fileUploadRequest.rejectReason }}
@@ -149,6 +171,7 @@ import axios from 'axios'
 
 const router = useRouter()
 const userId = sessionStorage.getItem('userId')
+const userRole = parseInt(sessionStorage.getItem('role') || '1')
 
 // 状态管理
 const messages = ref([])
@@ -172,15 +195,27 @@ onMounted(() => {
   loadMajors()
 })
 
-// 获取列表 (已修改排序逻辑：最新在前)
+// 修改 InboxView.vue 中的 fetchInbox 函数
 async function fetchInbox() {
   loadingList.value = true
   try {
-    const res = await axios.get('/api/messages/inbox', { params: { userId } })
+    const res = await axios.get('/api/messages/inbox', {
+      params: {
+        userId: userId,
+        // 添加下面这两个参数
+        page: 0,     // 获取第 1 页
+        size: 100    // 每页获取 100 条（根据需要调整，比如 1000）
+      }
+    })
     if (res.data.success) {
+      // 后端返回的是 Page 对象，数据在 data.content
       const rawContent = res.data.data.content || []
-      // 核心修改：通过 createdAt 时间进行倒序排列，确保最新收到的在最上面
+
+      // 排序：最新在前
       messages.value = rawContent.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+
+      // 如果你发现发了新邮件还是不显示，请检查后端 SQL 是否真的查到了最新数据
+      console.log("当前获取到的邮件总数:", messages.value.length)
     }
   } catch (e) {
     console.error('获取信箱失败', e)
@@ -189,7 +224,6 @@ async function fetchInbox() {
   }
 }
 
-// 获取详情
 async function fetchMessageDetail(id) {
   activeMsgId.value = id
   try {
@@ -204,13 +238,11 @@ async function fetchMessageDetail(id) {
   }
 }
 
-// 加载专业列表
 async function loadMajors() {
   const res = await axios.get('/api/majors')
   if (res.data.success) majorList.value = res.data.data
 }
 
-// 文件操作
 function handleFileSelect(e) {
   applyForm.value.wordFile = e.target.files[0]
 }
@@ -282,7 +314,6 @@ const formatDate = (dateStr) => {
 </script>
 
 <style scoped>
-/* 样式部分完全保留，未做任何修改 */
 .home-container { height: 100vh; width: 100%; display: flex; background-color: #f5f7fa; }
 .sidebar { width: 220px; background-color: #001529; color: #fff; display: flex; flex-direction: column; padding: 20px 16px; flex-shrink: 0; }
 .logo { font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: center; color: #fff; }
@@ -328,6 +359,26 @@ const formatDate = (dateStr) => {
 .action-box h4 { margin-top: 0; color: #303133; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
 .info-grid p { margin: 8px 0; font-size: 14px; }
 .status-tag { background: #e6a23c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+
+/* AI 结果样式 */
+.ai-audit-results {
+  margin-top: 15px;
+  padding: 12px;
+  background-color: #f0f9ff;
+  border: 1px solid #bae7ff;
+  border-radius: 6px;
+}
+.ai-title { font-weight: bold; margin-bottom: 8px; color: #0050b3; font-size: 14px; }
+.ai-failed { color: #8c8c8c; font-style: italic; }
+.ai-badge {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 13px;
+}
+.ai-badge.manual_review { background-color: #fff7e6; color: #d46b08; border: 1px solid #ffd591; }
+.ai-badge.reject { background-color: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+.ai-reason { margin-top: 8px; font-size: 13px; color: #595959; background: white; padding: 5px; border-radius: 4px; }
 
 .button-group { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
 .btn-action { border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 13px; color: white; }
