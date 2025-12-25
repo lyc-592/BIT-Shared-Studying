@@ -25,6 +25,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
+import com.example.sharing.message.service.AiReviewService;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,21 +45,27 @@ public class FileUploadRequestService {
     private final UserRepository userRepository;
     private final UserCoursePermissionRepository userCoursePermissionRepository;
     private final CourseRepository courseRepository; // 若已有就不用加
+    private final AiReviewService aiReviewService;
 
     // 待确认文件夹路径（根据你实际情况改成配置）
     private final String pendingBaseDir = "/root/unsure";
     private final String approvedBaseDir = "/root/unsure";
 
+//    private final String pendingBaseDir = "D:/myfiles2";
+//    private final String approvedBaseDir = "D:/myfiles2";
+
     public FileUploadRequestService(FileUploadRequestRepository fileUploadRequestRepository,
                                     MessageRepository messageRepository,
                                     UserRepository userRepository,
                                     UserCoursePermissionRepository userCoursePermissionRepository,
-                                    CourseRepository courseRepository) {
+                                    CourseRepository courseRepository,
+                                    AiReviewService aiReviewService) {
         this.fileUploadRequestRepository = fileUploadRequestRepository;
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
         this.userCoursePermissionRepository = userCoursePermissionRepository;
         this.courseRepository = courseRepository;
+        this.aiReviewService = aiReviewService;
     }
 
     /**
@@ -108,7 +115,13 @@ public class FileUploadRequestService {
         req.setTargetAbsolutePath(targetAbsolutePath);
         fileUploadRequestRepository.save(req);
 
-        // TODO：将来可以在这里调用 AI 建议函数，填充 aiSuggestAction / aiSuggestReason
+        // ===== 调用 AI 审查（一般是异步）=====
+        try {
+            aiReviewService.runAiReviewForRequest(req.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 不中断正常上传流程，AI 失败就当没填建议
+        }
 
 // ========= 只给“有该课程权限的用户”发消息 =========
 

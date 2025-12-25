@@ -485,6 +485,7 @@ public class TopicService {
             dto.setAttachments(attachmentDTOs);
         }
 
+
         return dto;
     }
 

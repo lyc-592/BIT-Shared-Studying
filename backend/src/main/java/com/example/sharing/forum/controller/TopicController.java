@@ -2,6 +2,8 @@ package com.example.sharing.forum.controller;
 
 import com.example.sharing.dto.ApiResponse;
 import com.example.sharing.forum.dto.*;
+import com.example.sharing.forum.entity.ActionType;
+import com.example.sharing.forum.service.ForumUserActionService;
 import com.example.sharing.forum.service.TopicService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import java.util.Optional;
 public class TopicController {
 
     private final TopicService topicService;
+    private final ForumUserActionService forumUserActionService;
 
     /**
      * 按论坛ID查找论坛下的话题，支持分页查询
@@ -26,7 +29,8 @@ public class TopicController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction) {
+            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(required = false) Long currentUserId) {
 
         try {
             Sort sort = getSortFromParams(sortBy, direction);
@@ -158,6 +162,78 @@ public class TopicController {
             return ApiResponse.success("获取热门话题成功", response);
         } catch (Exception e) {
             return ApiResponse.fail("获取热门话题失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 点赞话题
+     */
+    @PostMapping("/like/{topicId}")
+    public ApiResponse<Void> likeTopic(
+            @PathVariable Long topicId,
+            @RequestParam Long userId) {
+        try {
+            boolean success = forumUserActionService.performAction(
+                    userId, ActionType.ACTION_TYPE_LIKE_TOPIC, topicId);
+            return success ?
+                    ApiResponse.success("点赞成功", null) :
+                    ApiResponse.fail("点赞失败");
+        } catch (Exception e) {
+            return ApiResponse.fail("点赞失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 取消点赞话题
+     */
+    @PostMapping("/unlike/{topicId}")
+    public ApiResponse<Void> unlikeTopic(
+            @PathVariable Long topicId,
+            @RequestParam Long userId) {
+        try {
+            boolean success = forumUserActionService.cancelAction(
+                    userId, ActionType.ACTION_TYPE_LIKE_TOPIC, topicId);
+            return success ?
+                    ApiResponse.success("取消点赞成功", null) :
+                    ApiResponse.fail("取消点赞失败");
+        } catch (Exception e) {
+            return ApiResponse.fail("取消点赞失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 收藏话题
+     */
+    @PostMapping("/collect/{topicId}")
+    public ApiResponse<Void> collectTopic(
+            @PathVariable Long topicId,
+            @RequestParam Long userId) {
+        try {
+            boolean success = forumUserActionService.performAction(
+                    userId, ActionType.ACTION_TYPE_COLLECT_TOPIC, topicId);
+            return success ?
+                    ApiResponse.success("收藏成功", null) :
+                    ApiResponse.fail("收藏失败");
+        } catch (Exception e) {
+            return ApiResponse.fail("收藏失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 取消收藏话题
+     */
+    @PostMapping("/uncollect/{topicId}")
+    public ApiResponse<Void> uncollectTopic(
+            @PathVariable Long topicId,
+            @RequestParam Long userId) {
+        try {
+            boolean success = forumUserActionService.cancelAction(
+                    userId, ActionType.ACTION_TYPE_COLLECT_TOPIC, topicId);
+            return success ?
+                    ApiResponse.success("取消收藏成功", null) :
+                    ApiResponse.fail("取消收藏失败");
+        } catch (Exception e) {
+            return ApiResponse.fail("取消收藏失败: " + e.getMessage());
         }
     }
 

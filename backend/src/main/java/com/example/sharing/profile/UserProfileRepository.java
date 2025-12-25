@@ -2,6 +2,7 @@ package com.example.sharing.profile;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
@@ -9,4 +10,6 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
     Optional<UserProfile> findByUser_Id(Long userId);
 
     boolean existsByUser_Id(Long userId);
+
+    List<UserProfile> findAByUser_Id(Long userId);
 }

@@ -4,6 +4,9 @@ import com.example.sharing.profile.UserProfile;
 import com.example.sharing.entity.Course;
 import lombok.Data;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -68,7 +71,8 @@ public class Topic {
 
     // 关联附件
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Attachment> attachments;
+    @SQLRestriction("comment_id is null")
+    List<Attachment> attachments;
 
     @PrePersist
     protected void onCreate() {

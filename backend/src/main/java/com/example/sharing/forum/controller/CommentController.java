@@ -2,7 +2,9 @@ package com.example.sharing.forum.controller;
 
 import com.example.sharing.dto.ApiResponse;
 import com.example.sharing.forum.dto.*;
+import com.example.sharing.forum.entity.ActionType;
 import com.example.sharing.forum.service.CommentService;
+import com.example.sharing.forum.service.ForumUserActionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -16,6 +18,7 @@ import java.util.Optional;
 public class CommentController {
 
     private final CommentService commentService;
+    private final ForumUserActionService forumUserActionService;
 
     /**
      * 获取评论详情
@@ -186,10 +189,15 @@ public class CommentController {
      * 点赞评论
      */
     @PostMapping("/like/{commentId}")
-    public ApiResponse<Void> likeComment(@PathVariable Long commentId) {
+    public ApiResponse<Void> likeComment(
+            @PathVariable Long commentId,
+            @RequestParam Long userId) {
         try {
-            commentService.incrementLikeCount(commentId);
-            return ApiResponse.success("点赞成功", null);
+            boolean success = forumUserActionService.performAction(
+                    userId, ActionType.ACTION_TYPE_LIKE_COMMENT, commentId);
+            return success ?
+                    ApiResponse.success("点赞成功", null) :
+                    ApiResponse.fail("点赞失败");
         } catch (Exception e) {
             return ApiResponse.fail("点赞失败: " + e.getMessage());
         }
@@ -199,10 +207,15 @@ public class CommentController {
      * 取消点赞评论
      */
     @PostMapping("/unlike/{commentId}")
-    public ApiResponse<Void> unlikeComment(@PathVariable Long commentId) {
+    public ApiResponse<Void> unlikeComment(
+            @PathVariable Long commentId,
+            @RequestParam Long userId) {
         try {
-            commentService.decrementLikeCount(commentId);
-            return ApiResponse.success("取消点赞成功", null);
+            boolean success = forumUserActionService.cancelAction(
+                    userId, ActionType.ACTION_TYPE_LIKE_COMMENT, commentId);
+            return success ?
+                    ApiResponse.success("取消点赞成功", null) :
+                    ApiResponse.fail("取消点赞失败");
         } catch (Exception e) {
             return ApiResponse.fail("取消点赞失败: " + e.getMessage());
         }

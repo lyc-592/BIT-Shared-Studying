@@ -251,4 +251,24 @@ public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
 
     @Query("SELECT a FROM Attachment a WHERE a.storageKey LIKE %:keyword%")
     Optional<Attachment> findByStorageKeyContaining(@Param("keyword") String keyword);
+
+    /**
+     * 根据话题ID查找话题本身的附件（comment_id为null的附件）
+     */
+    List<Attachment> findByTopicIdAndCommentIdIsNull(Long topicId);
+
+    /**
+     * 根据话题ID查找话题本身的附件，并按创建时间排序
+     */
+    List<Attachment> findByTopicIdAndCommentIdIsNullOrderByCreatedAtAsc(Long topicId);
+
+    /**
+     * 根据话题ID查找话题本身的附件，并按创建时间倒序排序
+     */
+    List<Attachment> findByTopicIdAndCommentIdIsNullOrderByCreatedAtDesc(Long topicId);
+
+    /**
+     * 根据评论ID查找该评论的附件（comment_id不为null的附件）
+     */
+    List<Attachment> findByCommentIdAndCommentIdIsNotNull(Long commentId);
 }
