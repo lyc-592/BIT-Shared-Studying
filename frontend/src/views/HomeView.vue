@@ -290,7 +290,21 @@ const goToCourseDetail = (id) => {
 .empty-state { text-align: center; color: #909399; margin-top: 50px; font-size: 16px; }
 .loading-state { text-align: center; color: #909399; margin-top: 30px; font-size: 14px; }
 .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-.course-card { background: #fff; border-radius: 8px; padding: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+.course-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+
+  /* 添加以下代码 */
+  min-height: 100px; /* 根据你的 UI 调整具体数值，建议在 90px - 110px 之间 */
+  box-sizing: border-box; /* 确保 padding 不会额外撑大高度 */
+}
 .course-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1); }
 .course-icon { font-size: 24px; background: #f0f7ff; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #409eff; }
 .course-info { display: flex; flex-direction: column; }

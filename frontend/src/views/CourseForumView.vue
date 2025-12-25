@@ -30,8 +30,12 @@
         <div class="topic-stats">
           <div class="stat-item">👁️ {{ topic.viewCount }}</div>
           <div class="stat-item">💬 {{ topic.replyCount }}</div>
-          <!-- 添加：点赞展示 -->
-          <div class="stat-item like-count">👍 {{ topic.likeCount }}</div>
+
+          <!-- 修改：增加点赞和收藏的状态显示 -->
+          <div class="stat-item" :class="{ 'highlight-like': topic.isLiked }">
+            {{ topic.isLiked ? '❤️' : '👍' }} {{ topic.likeCount }}
+          </div>
+          <div v-if="topic.isCollected" class="stat-item highlight-collect">⭐ 已收藏</div>
         </div>
       </div>
 
@@ -52,6 +56,7 @@ import axios from 'axios'
 const route = useRoute()
 const router = useRouter()
 const courseNo = route.params.courseNo
+const currentUserId = sessionStorage.getItem('userId')
 
 const loading = ref(true)
 const forumInfo = ref({ forumNo: null, courseName: '', topicCount: 0 })
@@ -75,7 +80,24 @@ async function fetchTopics(page) {
       params: { page, size: 20 }
     })
     if (res.data.success) {
-      topics.value = res.data.data.content
+      const content = res.data.data.content
+
+      // --- 关键：批量查询点赞/收藏状态 ---
+      if (currentUserId && content.length > 0) {
+        const topicIds = content.map(t => t.id)
+        const authorIds = content.map(t => t.author.userId)
+        const statusRes = await axios.post('/api/actions/topic-status/batch',
+            { topicIds, authorIds },
+            { params: { userId: currentUserId } }
+        )
+        const statusData = statusRes.data.data
+        content.forEach(t => {
+          t.isLiked = statusData.liked[t.id]
+          t.isCollected = statusData.collected[t.id]
+        })
+      }
+
+      topics.value = content
       totalPages.value = res.data.data.totalPages
       currentPage.value = res.data.data.pageNumber
     }
@@ -102,8 +124,12 @@ function goToDetail(id) {
 .topic-preview { color: #606266; font-size: 14px; margin-bottom: 12px; }
 .topic-meta { font-size: 12px; color: #999; display: flex; gap: 15px; }
 .ref-path { color: #409eff; background: #ecf5ff; padding: 0 5px; border-radius: 3px; }
-.topic-stats { display: flex; flex-direction: column; justify-content: center; min-width: 70px; padding-left: 20px; border-left: 1px solid #f0f0f0; gap: 5px; color: #909399; font-size: 13px; }
-.like-count { color: #f56c6c; font-weight: bold; }
+.topic-stats { display: flex; flex-direction: column; justify-content: center; min-width: 90px; padding-left: 20px; border-left: 1px solid #f0f0f0; gap: 5px; color: #909399; font-size: 13px; }
+
+/* 状态高亮样式 */
+.highlight-like { color: #f5222d; font-weight: bold; }
+.highlight-collect { color: #faad14; font-weight: bold; }
+
 .btn-create { background: #409eff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
 .back-btn { padding: 8px 16px; cursor: pointer; background: white; border: 1px solid #dcdfe6; border-radius: 4px; }
 </style>
