@@ -1,6 +1,6 @@
-package com.example.sharing.service;
+package com.example.sharing.core.service;
 
-import com.example.sharing.dto.FileNode;
+import com.example.sharing.core.dto.FileNode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

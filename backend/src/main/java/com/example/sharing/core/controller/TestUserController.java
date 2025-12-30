@@ -1,7 +1,7 @@
-package com.example.sharing.controller;
+package com.example.sharing.core.controller;
 
-import com.example.sharing.entity.User;
-import com.example.sharing.repository.UserRepository;
+import com.example.sharing.core.entity.User;
+import com.example.sharing.core.repository.UserRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

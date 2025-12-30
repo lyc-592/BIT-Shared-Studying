@@ -1,7 +1,7 @@
 package com.example.sharing.message.entity;
 
 import com.example.sharing.message.enums.ApplyStatus;
-import com.example.sharing.entity.User;
+import com.example.sharing.core.entity.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

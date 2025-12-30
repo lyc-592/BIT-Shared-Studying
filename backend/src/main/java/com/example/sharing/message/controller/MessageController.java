@@ -1,6 +1,6 @@
 package com.example.sharing.message.controller;
 
-import com.example.sharing.dto.ApiResponse;
+import com.example.sharing.core.dto.ApiResponse;
 import com.example.sharing.message.dto.MessageDTO;
 import com.example.sharing.message.dto.MessageDetailDTO;
 import com.example.sharing.message.enums.MessageType;

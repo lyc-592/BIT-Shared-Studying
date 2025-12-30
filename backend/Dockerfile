@@ -1,14 +1,17 @@
-# 使用官方Java基础镜像
-FROM openjdk:26-ea-21-jdk-slim
+FROM openjdk:21-slim
 
-# 设置工作目录
-WORKDIR /app
+# 设置时区为上海
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone
 
-# 拷贝构建好的jar包
-ADD ./target/Sharing-1.0-SNAPSHOT.jar DemoApp.jar
+# 创建应用运行所需的工作目录（保持与现有完全一致）
+RUN mkdir -p /root/mysql_file /root/sharing_files /root/Apply /root/unsure
 
-# 暴露端口
+# 将打包好的jar包复制到容器中
+COPY target/Sharing-0.0.1-SNAPSHOT.jar /app.jar
+
+# 暴露应用端口
 EXPOSE 8080
 
-# 启动命令
-ENTRYPOINT ["sh", "-c", "java -jar DemoApp.jar"]
+# 启动命令 - 使用你原有的application.yml配置
+ENTRYPOINT ["java", "-jar", "/app.jar"]

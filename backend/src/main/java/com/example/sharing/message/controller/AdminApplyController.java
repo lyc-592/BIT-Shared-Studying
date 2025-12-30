@@ -1,6 +1,6 @@
 package com.example.sharing.message.controller;
 
-import com.example.sharing.dto.ApiResponse;
+import com.example.sharing.core.dto.ApiResponse;
 import com.example.sharing.message.service.AdminApplyService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

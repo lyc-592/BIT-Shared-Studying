@@ -1,4 +1,4 @@
-package com.example.sharing.dto;
+package com.example.sharing.core.dto;
 
 
 import java.util.List;

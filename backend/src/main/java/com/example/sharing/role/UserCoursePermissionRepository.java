@@ -1,9 +1,8 @@
 package com.example.sharing.role;
 
 
-import com.example.sharing.entity.User;
-import com.example.sharing.entity.Course;
-import com.example.sharing.role.UserCoursePermission;
+import com.example.sharing.core.entity.User;
+import com.example.sharing.core.entity.Course;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.example.sharing.forum.controller;
 
-import com.example.sharing.dto.ApiResponse;
+import com.example.sharing.core.dto.ApiResponse;
 import com.example.sharing.forum.dto.AttachmentPreviewInfoDTO;
 import com.example.sharing.forum.entity.Attachment;
 import com.example.sharing.forum.service.ForumFileService;

@@ -1,6 +1,6 @@
 package com.example.sharing.forum.service;
 
-import com.example.sharing.entity.User;
+import com.example.sharing.core.entity.User;
 import com.example.sharing.forum.dto.PageResponse;
 import com.example.sharing.forum.entity.ActionType;
 import com.example.sharing.forum.entity.ForumUserAction;
@@ -8,8 +8,7 @@ import com.example.sharing.forum.repository.ForumUserActionRepository;
 import com.example.sharing.profile.UserProfile;
 import com.example.sharing.profile.UserProfileDTO;
 import com.example.sharing.profile.UserProfileRepository;
-import com.example.sharing.profile.UserProfileService;
-import com.example.sharing.repository.UserRepository;
+import com.example.sharing.core.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

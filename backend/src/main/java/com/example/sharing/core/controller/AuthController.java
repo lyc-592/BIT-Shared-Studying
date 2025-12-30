@@ -1,12 +1,12 @@
-package com.example.sharing.controller;
+package com.example.sharing.core.controller;
 
 
-import com.example.sharing.dto.ApiResponse;
-import com.example.sharing.dto.LoginRequest;
-import com.example.sharing.dto.RegisterRequest;
-import com.example.sharing.dto.UserResponse;
-import com.example.sharing.entity.User;
-import com.example.sharing.service.UserService;
+import com.example.sharing.core.dto.ApiResponse;
+import com.example.sharing.core.dto.LoginRequest;
+import com.example.sharing.core.dto.RegisterRequest;
+import com.example.sharing.core.dto.UserResponse;
+import com.example.sharing.core.entity.User;
+import com.example.sharing.core.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

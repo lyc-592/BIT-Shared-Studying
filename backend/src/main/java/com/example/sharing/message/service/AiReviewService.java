@@ -1,11 +1,10 @@
 package com.example.sharing.message.service;
 
-import com.example.sharing.dto.FileNode;
-import com.example.sharing.entity.Course;
+import com.example.sharing.core.dto.FileNode;
 import com.example.sharing.message.entity.FileUploadRequest;
 import com.example.sharing.message.repository.FileUploadRequestRepository;
-import com.example.sharing.repository.CourseRepository;
-import com.example.sharing.service.CourseFileService;
+import com.example.sharing.core.repository.CourseRepository;
+import com.example.sharing.core.service.CourseFileService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;

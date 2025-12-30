@@ -1,11 +1,10 @@
 package com.example.sharing.forum.entity;
 
 import com.example.sharing.profile.UserProfile;
-import com.example.sharing.entity.Course;
+import com.example.sharing.core.entity.Course;
 import lombok.Data;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.example.sharing.forum.controller;
 
-import com.example.sharing.dto.ApiResponse;
+import com.example.sharing.core.dto.ApiResponse;
 import com.example.sharing.forum.dto.CommentStatusRequest;
 import com.example.sharing.forum.dto.PageResponse;
 import com.example.sharing.forum.dto.TopicStatusRequest;

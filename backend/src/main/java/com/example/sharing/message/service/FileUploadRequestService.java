@@ -1,6 +1,6 @@
 package com.example.sharing.message.service;
 
-import com.example.sharing.dto.ApiResponse;
+import com.example.sharing.core.dto.ApiResponse;
 import com.example.sharing.message.dto.FileUploadRequestDTO;
 import com.example.sharing.message.entity.FileUploadRequest;
 import com.example.sharing.message.entity.Message;
@@ -8,12 +8,12 @@ import com.example.sharing.message.enums.FileUploadStatus;
 import com.example.sharing.message.enums.MessageType;
 import com.example.sharing.message.repository.FileUploadRequestRepository;
 import com.example.sharing.message.repository.MessageRepository;
-import com.example.sharing.entity.User;
-import com.example.sharing.repository.UserRepository;
+import com.example.sharing.core.entity.User;
+import com.example.sharing.core.repository.UserRepository;
 import com.example.sharing.role.UserCoursePermission;
 import com.example.sharing.role.UserCoursePermissionRepository;
-import com.example.sharing.entity.Course;
-import com.example.sharing.repository.CourseRepository;
+import com.example.sharing.core.entity.Course;
+import com.example.sharing.core.repository.CourseRepository;
 import org.springframework.core.io.Resource;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import jakarta.servlet.http.HttpServletRequest;
-import com.example.sharing.message.service.AiReviewService;
 
 import java.io.File;
 import java.io.FileNotFoundException;

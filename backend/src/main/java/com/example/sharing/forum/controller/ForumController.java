@@ -1,11 +1,11 @@
 package com.example.sharing.forum.controller;
 
-import com.example.sharing.dto.ApiResponse;
-import com.example.sharing.entity.Course;
+import com.example.sharing.core.dto.ApiResponse;
+import com.example.sharing.core.entity.Course;
 import com.example.sharing.forum.dto.ForumDTO;
 import com.example.sharing.forum.entity.Forum;
 import com.example.sharing.forum.service.ForumService;
-import com.example.sharing.repository.CourseRepository;
+import com.example.sharing.core.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

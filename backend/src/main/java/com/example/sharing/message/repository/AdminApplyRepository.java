@@ -2,7 +2,7 @@ package com.example.sharing.message.repository;
 
 import com.example.sharing.message.entity.AdminApply;
 import com.example.sharing.message.enums.ApplyStatus;
-import com.example.sharing.entity.User;
+import com.example.sharing.core.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

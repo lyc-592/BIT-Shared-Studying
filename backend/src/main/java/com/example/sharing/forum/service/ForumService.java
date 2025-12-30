@@ -2,7 +2,7 @@ package com.example.sharing.forum.service;
 
 import com.example.sharing.forum.entity.Forum;
 import com.example.sharing.forum.dto.ForumDTO;
-import com.example.sharing.repository.CourseRepository;
+import com.example.sharing.core.repository.CourseRepository;
 import com.example.sharing.forum.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
