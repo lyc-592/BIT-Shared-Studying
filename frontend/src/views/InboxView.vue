@@ -248,15 +248,15 @@ function handleFileSelect(e) {
 }
 
 function downloadResume(id) {
-  window.open(`http://localhost:8080/api/admin-apply/${id}/word/download`)
+  window.open(`/api/admin-apply/${id}/word/download`)
 }
 
 function previewFile(requestId) {
-  window.open(`http://localhost:8080/api/file-upload-requests/${requestId}/preview`)
+  window.open(`/api/file-upload-requests/${requestId}/preview`)
 }
 
 function downloadFile(requestId) {
-  window.open(`http://localhost:8080/api/file-upload-requests/${requestId}/download`)
+  window.open(`/api/file-upload-requests/${requestId}/download`)
 }
 
 async function handleApprove(msgId) {

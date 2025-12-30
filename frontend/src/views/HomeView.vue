@@ -222,6 +222,8 @@ async function handleSearch() {
     else { errorMessage.value = '请先从下拉列表中选择一个有效的专业'; return }
   }
 
+  selectedMajorName.value = currentSelectedMajor.value.majorName
+
   try {
     infoMessage.value = '加载中...'
     const res = await axios.get(`/api/majors/${currentSelectedMajor.value.majorNo}/courses`)
@@ -257,39 +259,263 @@ const goToCourseDetail = (id) => {
 
 <style scoped>
 /* 样式不变 */
-.home-container { height: 100vh; width: 100%; display: flex; background-color: #f5f7fa; }
-.sidebar { width: 220px; background-color: #001529; color: #fff; display: flex; flex-direction: column; padding: 20px 16px; flex-shrink: 0; }
-.logo { font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: center; color: #fff; }
-.nav-menu { display: flex; flex-direction: column; gap: 10px; }
-.nav-item { width: 100%; padding: 10px 12px; border: none; border-radius: 4px; background: transparent; color: #ccc; text-align: left; cursor: pointer; font-size: 15px; transition: all 0.3s; }
-.nav-item:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
-.nav-item.active { background-color: #409eff; color: #fff; font-weight: bold; }
-.main-content { flex: 1; padding: 20px 40px; display: flex; flex-direction: column; overflow-y: auto; }
-.main-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; background: #fff; padding: 15px 25px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); height: 70px; box-sizing: border-box; }
-.search-bar-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; gap: 15px; }
-.search-input-container { position: relative; width: 300px; max-width: 100%; }
-.search-input { width: 100%; padding: 10px 15px; border-radius: 4px; border: 1px solid #dcdfe6; outline: none; font-size: 14px; box-sizing: border-box; transition: border-color 0.2s; }
-.search-input:focus { border-color: #409eff; }
-.search-btn { flex-shrink: 0; padding: 10px 24px; border: none; border-radius: 4px; background-color: #409eff; color: #fff; cursor: pointer; font-size: 14px; font-weight: 500; transition: background-color 0.3s; height: 38px; display: flex; align-items: center; gap: 8px; }
-.search-btn:hover { background-color: #66b1ff; }
-.dropdown { width: 100%; background: #fff; border: 1px solid #e4e7ed; border-radius: 4px; position: absolute; top: 105%; left: 0; max-height: 240px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-.dropdown-item { padding: 10px 15px; cursor: pointer; font-size: 14px; color: #606266; }
-.dropdown-item:hover { background-color: #ecf5ff; color: #409eff; }
-.top-right { display: flex; align-items: center; justify-content: flex-end; min-width: 120px; }
-.welcome-user { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #606266; }
-.role-badge { font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid; font-weight: bold; }
-.nav-btn { padding: 8px 20px; font-size: 14px; background-color: #409eff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-.logout-btn { padding: 5px 12px; cursor: pointer; border-radius: 4px; border: 1px solid #dcdfe6; background-color: #fff; font-size: 12px; color: #606266; }
-.logout-btn:hover { border-color: #c6e2ff; color: #409eff; }
-.error-banner, .info-banner { margin-bottom: 20px; padding: 10px 15px; border-radius: 4px; font-size: 14px; }
-.error-banner { border: 1px solid #fde2e2; background-color: #fef0f0; color: #f56c6c; }
-.info-banner { border: 1px solid #e1f3d8; background-color: #f0f9eb; color: #67c23a; }
-.content-body { flex: 1; display: flex; flex-direction: column; }
-.section-title { font-size: 18px; color: #303133; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid #409eff; display: flex; align-items: center; gap: 10px; }
-.count-badge { font-size: 14px; color: #909399; font-weight: normal; }
-.empty-state { text-align: center; color: #909399; margin-top: 50px; font-size: 16px; }
-.loading-state { text-align: center; color: #909399; margin-top: 30px; font-size: 14px; }
-.course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+.home-container {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  background-color: #f5f7fa;
+}
+.sidebar {
+  width: 220px;
+  background-color: #001529;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 16px;
+  flex-shrink: 0;
+}
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #fff;
+}
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.nav-item {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #ccc;
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s;
+}
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.nav-item.active {
+  background-color: #409eff;
+  color: #fff; font-weight: bold;
+}
+.main-content {
+  flex: 1; padding: 20px 40px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  background: #fff;
+  padding: 15px 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  height: 70px;
+  box-sizing: border-box;
+}
+.search-bar-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+.search-input-container {
+  position: relative;
+  width: 300px;
+  max-width: 100%;
+}
+.search-input {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
+  outline: none;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.search-input:focus {
+  border-color: #409eff;
+}
+.search-btn {
+  flex-shrink: 0;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 4px;
+  background-color: #409eff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.search-btn:hover {
+  background-color: #66b1ff;
+}
+.dropdown {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  position: absolute;
+  top: 105%; left: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.dropdown-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #606266;
+}
+.dropdown-item:hover {
+  background-color: #ecf5ff;
+  color: #409eff;
+}
+/* 右上角容器样式 */
+.top-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 120px;
+}
+
+/* 欢迎用户区域样式 */
+.welcome-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #606266;
+}
+
+/* 角色徽章样式 */
+.role-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+  font-weight: bold;
+}
+
+/* 导航按钮样式 */
+.nav-btn {
+  padding: 8px 20px;
+  font-size: 14px;
+  background-color: #409eff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 退出登录按钮基础样式 */
+.logout-btn {
+  padding: 5px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
+  background-color: #fff;
+  font-size: 12px;
+  color: #606266;
+}
+
+/* 退出登录按钮 hover 状态 */
+.logout-btn:hover {
+  border-color: #c6e2ff;
+  color: #409eff;
+}
+
+/* 提示横幅通用样式（错误/信息） */
+.error-banner, .info-banner {
+  margin-bottom: 20px;
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* 错误横幅样式 */
+.error-banner {
+  border: 1px solid #fde2e2;
+  background-color: #fef0f0;
+  color: #f56c6c;
+}
+
+/* 信息横幅样式 */
+.info-banner {
+  border: 1px solid #e1f3d8;
+  background-color: #f0f9eb;
+  color: #67c23a;
+}
+
+/* 内容主体容器 */
+.content-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 章节标题样式 */
+.section-title {
+  font-size: 18px;
+  color: #303133;
+  margin-bottom: 15px;
+  padding-left: 10px;
+  border-left: 4px solid #409eff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 数量徽章样式 */
+.count-badge {
+  font-size: 14px;
+  color: #909399;
+  font-weight: normal;
+}
+
+/* 空状态样式 */
+.empty-state {
+  text-align: center;
+  color: #909399;
+  margin-top: 50px;
+  font-size: 16px;
+}
+
+/* 加载状态样式 */
+.loading-state {
+  text-align: center;
+  color: #909399;
+  margin-top: 30px;
+  font-size: 14px;
+}
+
+/* 课程网格布局 */
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* 课程卡片样式 */
 .course-card {
   background: #fff;
   border-radius: 8px;
@@ -305,10 +531,56 @@ const goToCourseDetail = (id) => {
   min-height: 100px; /* 根据你的 UI 调整具体数值，建议在 90px - 110px 之间 */
   box-sizing: border-box; /* 确保 padding 不会额外撑大高度 */
 }
-.course-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1); }
-.course-icon { font-size: 24px; background: #f0f7ff; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #409eff; }
-.course-info { display: flex; flex-direction: column; }
-.course-name { margin: 0 0 5px 0; font-size: 16px; color: #303133; font-weight: 600; }
-.course-no { margin: 0; font-size: 12px; color: #909399; }
-.course-dept { margin: 2px 0 0 0; font-size: 12px; color: #409eff; background: #ecf5ff; padding: 2px 6px; border-radius: 4px; display: inline-block; width: fit-content;}
+
+/* 课程卡片 hover 状态 */
+.course-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* 课程图标样式 */
+.course-icon {
+  font-size: 24px;
+  background: #f0f7ff;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #409eff;
+}
+
+/* 课程信息容器 */
+.course-info {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 课程名称样式 */
+.course-name {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  color: #303133;
+  font-weight: 600;
+}
+
+/* 课程编号样式 */
+.course-no {
+  margin: 0;
+  font-size: 12px;
+  color: #909399;
+}
+
+/* 课程所属部门样式 */
+.course-dept {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  color: #409eff;
+  background: #ecf5ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
 </style>
