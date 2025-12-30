@@ -1,4 +1,4 @@
-FROM openjdk:21-slim
+FROM swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/library/openjdk:21
 
 # 设置时区为上海
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
