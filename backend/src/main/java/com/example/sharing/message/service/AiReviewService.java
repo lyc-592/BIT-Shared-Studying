@@ -1,11 +1,10 @@
 package com.example.sharing.message.service;
 
-import com.example.sharing.dto.FileNode;
-import com.example.sharing.entity.Course;
+import com.example.sharing.core.dto.FileNode;
 import com.example.sharing.message.entity.FileUploadRequest;
 import com.example.sharing.message.repository.FileUploadRequestRepository;
-import com.example.sharing.repository.CourseRepository;
-import com.example.sharing.service.CourseFileService;
+import com.example.sharing.core.repository.CourseRepository;
+import com.example.sharing.core.service.CourseFileService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -242,7 +241,8 @@ public class AiReviewService {
         if (nodes == null) return;
 
         for (FileNode node : nodes) {
-            String relativePath = node.getPath(); // 课件\2023级\15-肖文卓-第2章.pdf
+            String relativePath = node.getPath(); // 课件/2023级/15-肖文卓-第2章.pdf 或类似
+
             String name = node.getName();
 
             if ("directory".equalsIgnoreCase(node.getType())) {
@@ -256,17 +256,16 @@ public class AiReviewService {
             String normOld = normalizeFilename(name);
             double score = calcNameSimilarity(normNew, normOld);
 
-            // 统一分隔符为 \
-            String relToCourse = relativePath.replace('/', '\\');
+            // 统一用 / 作为内部相对路径分隔符
+            String relToCourse = relativePath.replace('\\', '/');
 
             CandidateFile cf = new CandidateFile();
-            // 如果你原来的 path 语义就是“相对课程目录”，可以继续用
-            cf.setPath(relToCourse);
-            // 也可以同时单独存一份，避免以后混淆
-            cf.setRelativeToCourse(relToCourse);
+            cf.setPath(relToCourse);           // 用于计算绝对路径
+            cf.setRelativeToCourse(relToCourse); // 也统一成 /
 
             cf.setDisplayName(name);
 
+            // 这里用 Path，自动按系统分隔符拼接
             String absPath = courseDir.resolve(relToCourse)
                     .toAbsolutePath()
                     .normalize()
@@ -745,32 +744,34 @@ public class AiReviewService {
     }
 
     private Path extractCourseRootFromTarget(String targetAbsolutePath) {
-        if (targetAbsolutePath == null) return null;
-        String p = targetAbsolutePath.replace('/', '\\');
-
-        // 找第一个下划线
-        int first = p.indexOf('_');
-        if (first < 0) {
-            // 根本没有 _，直接用完整路径
-            return Paths.get(targetAbsolutePath).toAbsolutePath().normalize();
+        if (targetAbsolutePath == null || targetAbsolutePath.isBlank()) {
+            return null;
         }
 
-        // 找第二个下划线
-        int second = p.indexOf('_', first + 1);
-        if (second < 0) {
-            // 只有一个 _，也当作没法分课程，直接用完整路径
-            return Paths.get(targetAbsolutePath).toAbsolutePath().normalize();
+        // 用 Path 处理，自动适配 Linux/Windows
+        Path full = Paths.get(targetAbsolutePath).toAbsolutePath().normalize();
+
+        // 从右往左找“包含 _ 的目录名”（课程目录）
+        Path cur = full;
+        Path courseDir = null;
+
+        while (cur != null) {
+            Path fileName = cur.getFileName();
+            if (fileName != null) {
+                String name = fileName.toString();
+                if (name.contains("_")) {
+                    courseDir = cur;
+                    break;
+                }
+            }
+            cur = cur.getParent();
         }
 
-        // 从第二个 _ 之后找第一个 \
-        int idxSlash = p.indexOf('\\', second);
-        if (idxSlash < 0) {
-            // 第二个 _ 后没有反斜杠，说明路径刚好停在课程目录上
-            return Paths.get(targetAbsolutePath).toAbsolutePath().normalize();
+        // 一个带 _ 的目录都没找到，就退回整个路径（兜底）
+        if (courseDir == null) {
+            return full;
         }
 
-        // 保留到这个反斜杠为止
-        String courseRootStr = p.substring(0, idxSlash);
-        return Paths.get(courseRootStr).toAbsolutePath().normalize();
+        return courseDir;
     }
 }

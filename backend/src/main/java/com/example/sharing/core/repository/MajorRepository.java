@@ -1,7 +1,7 @@
 // MajorRepository.java
-package com.example.sharing.repository;
+package com.example.sharing.core.repository;
 
-import com.example.sharing.entity.Major;
+import com.example.sharing.core.entity.Major;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MajorRepository extends JpaRepository<Major, Long> {

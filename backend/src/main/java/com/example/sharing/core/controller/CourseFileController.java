@@ -1,8 +1,8 @@
-package com.example.sharing.controller;
+package com.example.sharing.core.controller;
 
 
-import com.example.sharing.dto.FileNode;
-import com.example.sharing.service.CourseFileService;
+import com.example.sharing.core.dto.FileNode;
+import com.example.sharing.core.service.CourseFileService;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;

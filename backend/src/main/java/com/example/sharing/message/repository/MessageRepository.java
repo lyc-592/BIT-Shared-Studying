@@ -2,7 +2,7 @@ package com.example.sharing.message.repository;
 
 import com.example.sharing.message.entity.Message;
 import com.example.sharing.message.enums.MessageType;
-import com.example.sharing.entity.User;
+import com.example.sharing.core.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

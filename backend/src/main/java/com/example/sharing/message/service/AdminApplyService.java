@@ -1,6 +1,6 @@
 package com.example.sharing.message.service;
 
-import com.example.sharing.dto.ApiResponse;
+import com.example.sharing.core.dto.ApiResponse;
 import com.example.sharing.message.dto.AdminApplyDTO;
 import com.example.sharing.message.entity.AdminApply;
 import com.example.sharing.message.entity.Message;
@@ -10,8 +10,8 @@ import com.example.sharing.message.repository.AdminApplyRepository;
 import com.example.sharing.message.repository.MessageRepository;
 import com.example.sharing.role.PermissionService;
 import com.example.sharing.role.GrantPermissionRequest;
-import com.example.sharing.entity.User;
-import com.example.sharing.repository.UserRepository;
+import com.example.sharing.core.entity.User;
+import com.example.sharing.core.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,4 +1,4 @@
-package com.example.sharing.entity;
+package com.example.sharing.core.entity;
 
 import jakarta.persistence.*;
 

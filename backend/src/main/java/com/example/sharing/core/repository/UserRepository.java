@@ -1,6 +1,6 @@
-package com.example.sharing.repository;
+package com.example.sharing.core.repository;
 
-import com.example.sharing.entity.User;
+import com.example.sharing.core.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

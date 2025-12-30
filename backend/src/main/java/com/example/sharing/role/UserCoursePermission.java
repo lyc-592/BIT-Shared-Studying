@@ -1,8 +1,8 @@
 package com.example.sharing.role;
 
 
-import com.example.sharing.entity.Course;
-import com.example.sharing.entity.User;
+import com.example.sharing.core.entity.Course;
+import com.example.sharing.core.entity.User;
 import jakarta.persistence.*;
 import lombok.Setter;
 

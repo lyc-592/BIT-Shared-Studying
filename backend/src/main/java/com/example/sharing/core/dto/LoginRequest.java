@@ -1,14 +1,13 @@
-package com.example.sharing.dto;
+package com.example.sharing.core.dto;
 
 
 /**
- * 注册请求体：只需要用户名、密码、邮箱
+ * 登录请求体：用户名 + 密码
  */
-public class RegisterRequest {
+public class LoginRequest {
 
     private String username;
     private String password;
-    private String email;
 
     public String getUsername() {
         return username;
@@ -24,13 +23,5 @@ public class RegisterRequest {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 }

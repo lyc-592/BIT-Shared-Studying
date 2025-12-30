@@ -1,7 +1,7 @@
-package com.example.sharing.controller;
+package com.example.sharing.core.controller;
 
-import com.example.sharing.dto.ApiResponse;
-import com.example.sharing.service.FileStorageService;
+import com.example.sharing.core.dto.ApiResponse;
+import com.example.sharing.core.service.FileStorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.core.io.Resource;

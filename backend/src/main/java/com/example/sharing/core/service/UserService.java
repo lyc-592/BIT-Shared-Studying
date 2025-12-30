@@ -1,8 +1,8 @@
-package com.example.sharing.service;
+package com.example.sharing.core.service;
 
 
-import com.example.sharing.entity.User;
-import com.example.sharing.repository.UserRepository;
+import com.example.sharing.core.entity.User;
+import com.example.sharing.core.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,11 +1,7 @@
 package com.example.sharing.role;
 
 
-import com.example.sharing.dto.ApiResponse;
-import com.example.sharing.role.GrantPermissionRequest;
-import com.example.sharing.role.PermissionCheckResultDto;
-import com.example.sharing.role.RevokePermissionRequest;
-import com.example.sharing.role.PermissionService;
+import com.example.sharing.core.dto.ApiResponse;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

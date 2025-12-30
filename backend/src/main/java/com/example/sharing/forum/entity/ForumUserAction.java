@@ -1,6 +1,6 @@
 package com.example.sharing.forum.entity;
 
-import com.example.sharing.entity.User;
+import com.example.sharing.core.entity.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.DynamicInsert;

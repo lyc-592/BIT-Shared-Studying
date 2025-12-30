@@ -1,7 +1,7 @@
 package com.example.sharing.forum.dto;
 
 import com.example.sharing.profile.UserProfileDTO;
-import com.example.sharing.dto.CourseDto;
+import com.example.sharing.core.dto.CourseDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

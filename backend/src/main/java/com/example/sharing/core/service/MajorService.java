@@ -1,11 +1,11 @@
-package com.example.sharing.service;
+package com.example.sharing.core.service;
 
-import com.example.sharing.dto.CourseDto;
-import com.example.sharing.dto.MajorDto;
-import com.example.sharing.entity.Major;
-import com.example.sharing.entity.MajorCourse;
-import com.example.sharing.repository.MajorCourseRepository;
-import com.example.sharing.repository.MajorRepository;
+import com.example.sharing.core.dto.CourseDto;
+import com.example.sharing.core.dto.MajorDto;
+import com.example.sharing.core.entity.Major;
+import com.example.sharing.core.entity.MajorCourse;
+import com.example.sharing.core.repository.MajorCourseRepository;
+import com.example.sharing.core.repository.MajorRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

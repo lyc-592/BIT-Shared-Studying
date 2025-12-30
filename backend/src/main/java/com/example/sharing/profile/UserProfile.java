@@ -1,6 +1,6 @@
 package com.example.sharing.profile;
 
-import com.example.sharing.entity.User;
+import com.example.sharing.core.entity.User;
 import jakarta.persistence.*;
 
 

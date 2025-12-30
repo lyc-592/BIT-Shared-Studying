@@ -1,9 +1,9 @@
-package com.example.sharing.controller;
+package com.example.sharing.core.controller;
 
-import com.example.sharing.dto.ApiResponse;
-import com.example.sharing.dto.CourseDto;
-import com.example.sharing.dto.MajorDto;
-import com.example.sharing.service.MajorService;
+import com.example.sharing.core.dto.ApiResponse;
+import com.example.sharing.core.dto.CourseDto;
+import com.example.sharing.core.dto.MajorDto;
+import com.example.sharing.core.service.MajorService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

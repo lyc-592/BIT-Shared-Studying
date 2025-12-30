@@ -1,11 +1,14 @@
 package com.example.sharing.role;
 
 
-import com.example.sharing.role.GrantPermissionRequest;
-import com.example.sharing.role.PermissionCheckResultDto;
-import com.example.sharing.role.RevokePermissionRequest;
-import com.example.sharing.entity.*;
-import com.example.sharing.repository.*;
+import com.example.sharing.core.entity.Course;
+import com.example.sharing.core.entity.Major;
+import com.example.sharing.core.entity.MajorCourse;
+import com.example.sharing.core.entity.User;
+import com.example.sharing.core.repository.CourseRepository;
+import com.example.sharing.core.repository.MajorCourseRepository;
+import com.example.sharing.core.repository.MajorRepository;
+import com.example.sharing.core.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
