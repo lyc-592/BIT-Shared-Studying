@@ -114,22 +114,125 @@ function goToDetail(id) {
 </script>
 
 <style scoped>
-.forum-container { padding: 30px; max-width: 1000px; margin: 0 auto; min-height: 100vh; background: #f9fafb; }
-.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-.topic-card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; display: flex; cursor: pointer; border: 1px solid #eee; transition: all 0.2s; }
-.topic-card:hover { border-color: #409eff; transform: translateY(-2px); }
-.topic-main { flex: 1; }
-.topic-title { margin: 0 0 10px 0; color: #303133; }
-.ref-icon { color: #67c23a; margin-right: 5px; }
-.topic-preview { color: #606266; font-size: 14px; margin-bottom: 12px; }
-.topic-meta { font-size: 12px; color: #999; display: flex; gap: 15px; }
-.ref-path { color: #409eff; background: #ecf5ff; padding: 0 5px; border-radius: 3px; }
-.topic-stats { display: flex; flex-direction: column; justify-content: center; min-width: 90px; padding-left: 20px; border-left: 1px solid #f0f0f0; gap: 5px; color: #909399; font-size: 13px; }
+/* 论坛主容器样式 */
+.forum-container {
+  padding: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+/* 头部容器样式 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* 话题卡片基础样式 */
+.topic-card {
+  background: white;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  display: flex;
+  cursor: pointer;
+  border: 1px solid #eee;
+  transition: all 0.2s;
+}
+
+/* 话题卡片 hover 状态 */
+.topic-card:hover {
+  border-color: #409eff;
+  transform: translateY(-2px);
+}
+
+/* 话题主体内容区域 */
+.topic-main {
+  flex: 1;
+}
+
+/* 话题标题样式 */
+.topic-title {
+  margin: 0 0 10px 0;
+  color: #303133;
+}
+
+/* 引用图标样式 */
+.ref-icon {
+  color: #67c23a;
+  margin-right: 5px;
+}
+
+/* 话题预览文本样式 */
+.topic-preview {
+  color: #606266;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+/* 话题元信息（作者/时间等）样式 */
+.topic-meta {
+  font-size: 12px;
+  color: #999;
+  display: flex;
+  gap: 15px;
+}
+
+/* 引用路径样式 */
+.ref-path {
+  color: #409eff;
+  background: #ecf5ff;
+  padding: 0 5px;
+  border-radius: 3px;
+}
+
+/* 话题统计信息（点赞/收藏/回复数）区域 */
+.topic-stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 90px;
+  padding-left: 20px;
+  border-left: 1px solid #f0f0f0;
+  gap: 5px;
+  color: #909399;
+  font-size: 13px;
+}
 
 /* 状态高亮样式 */
-.highlight-like { color: #f5222d; font-weight: bold; }
-.highlight-collect { color: #faad14; font-weight: bold; }
+.highlight-like {
+  color: #f5222d;
+  font-weight: bold;
+}
 
-.btn-create { background: #409eff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
-.back-btn { padding: 8px 16px; cursor: pointer; background: white; border: 1px solid #dcdfe6; border-radius: 4px; }
+.highlight-collect {
+  color: #faad14;
+  font-weight: bold;
+}
+
+/* 创建话题按钮样式 */
+.btn-create {
+  background: #409eff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 返回按钮样式 */
+.back-btn {
+  padding: 8px 16px;
+  cursor: pointer;
+  background: white;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+}
 </style>

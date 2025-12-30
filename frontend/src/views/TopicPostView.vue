@@ -89,20 +89,129 @@ async function submitTopic() {
 </script>
 
 <style scoped>
-.post-page { padding: 40px; background: #f0f2f5; min-height: 100vh; }
-.post-container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.reference-info { background: #f0f9eb; border: 1px solid #c2e7b0; padding: 12px; margin-bottom: 25px; border-radius: 4px; display: flex; align-items: center; }
-.ref-label { font-weight: bold; color: #67c23a; font-size: 14px; }
-.ref-path { margin: 0 10px; background: #fff; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 13px; color: #409eff; flex: 1; overflow: hidden; text-overflow: ellipsis; }
-.btn-clear-ref { border: none; background: transparent; color: #999; cursor: pointer; }
-.form-item { margin-bottom: 20px; }
-.form-item label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
-.input-title { width: 100%; padding: 12px; border: 1px solid #dcdfe6; border-radius: 4px; box-sizing: border-box; }
-.input-text { width: 100%; padding: 12px; border: 1px solid #dcdfe6; border-radius: 4px; box-sizing: border-box; resize: vertical; }
-.file-list { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
-.file-tag { background: #ecf5ff; color: #409eff; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
-.remove-file { margin-left: 5px; cursor: pointer; font-weight: bold; }
-.post-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; }
-.btn-submit { background: #409eff; color: white; border: none; padding: 10px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-.btn-cancel { background: #909399; color: white; border: none; padding: 10px 25px; border-radius: 4px; cursor: pointer; }
+.post-page {
+  padding: 40px;
+  background: #f0f2f5;
+  min-height: 100vh;
+}
+
+.post-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.reference-info {
+  background: #f0f9eb;
+  border: 1px solid #c2e7b0;
+  padding: 12px;
+  margin-bottom: 25px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.ref-label {
+  font-weight: bold;
+  color: #67c23a;
+  font-size: 14px;
+}
+
+.ref-path {
+  margin: 0 10px;
+  background: #fff;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 13px;
+  color: #409eff;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-clear-ref {
+  border: none;
+  background: transparent;
+  color: #999;
+  cursor: pointer;
+}
+
+.form-item {
+  margin-bottom: 20px;
+}
+
+.form-item label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+.input-title {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.input-text {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.file-list {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.file-tag {
+  background: #ecf5ff;
+  color: #409eff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.remove-file {
+  margin-left: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.post-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn-submit {
+  background: #409eff;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-cancel {
+  background: #909399;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 4px;
+  cursor: pointer;
+}
 </style>

@@ -120,19 +120,127 @@ const goToHome = () => router.push('/')
 
 <style scoped>
 /* 样式不变 */
-.auth-container { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #eef1f6; position: relative; }
-.back-home-btn { position: absolute; top: 30px; left: 30px; padding: 10px 20px; background: white; border: 1px solid #dcdfe6; cursor: pointer; border-radius: 4px; color: #606266; display: flex; align-items: center; gap: 8px; transition: all 0.3s; }
-.back-home-btn:hover { color: #409eff; border-color: #c6e2ff; }
-.auth-box { width: 350px; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
-.auth-box h2 { margin-bottom: 30px; color: #303133; }
-.form-group { margin-bottom: 20px; text-align: left; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #606266; }
-.input-wrapper { position: relative; }
-.form-group input { width: 100%; padding: 10px; border: 1px solid #dcdfe6; border-radius: 4px; box-sizing: border-box; transition: border-color 0.3s; }
-.form-group input:focus { border-color: #409eff; outline: none; }
-.submit-btn { width: 100%; padding: 12px; background-color: #409eff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; font-size: 16px; transition: background 0.3s; }
-.submit-btn:hover { background-color: #66b1ff; }
-.submit-btn:disabled { background-color: #a0cfff; cursor: not-allowed; }
-.link-text { margin-top: 20px; color: #606266; cursor: pointer; font-size: 14px; transition: color 0.3s; }
-.link-text:hover { color: #409eff; text-decoration: underline; }
+/* 认证页面整体容器（登录/注册等） */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #eef1f6;
+  position: relative;
+}
+
+/* 返回首页按钮 */
+.back-home-btn {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  padding: 10px 20px;
+  background: white;
+  border: 1px solid #dcdfe6;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #606266;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+}
+
+/* 返回首页按钮 hover 状态 */
+.back-home-btn:hover {
+  color: #409eff;
+  border-color: #c6e2ff;
+}
+
+/* 认证卡片（登录/注册表单容器） */
+.auth-box {
+  width: 350px;
+  padding: 40px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+/* 认证卡片标题 */
+.auth-box h2 {
+  margin-bottom: 30px;
+  color: #303133;
+}
+
+/* 表单组容器 */
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+/* 表单标签 */
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #606266;
+}
+
+/* 输入框包装器（用于定位图标等扩展） */
+.input-wrapper {
+  position: relative;
+}
+
+/* 表单输入框基础样式 */
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+/* 表单输入框聚焦状态 */
+.form-group input:focus {
+  border-color: #409eff;
+  outline: none;
+}
+
+/* 提交按钮基础样式 */
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #409eff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+/* 提交按钮 hover 状态 */
+.submit-btn:hover {
+  background-color: #66b1ff;
+}
+
+/* 提交按钮禁用状态 */
+.submit-btn:disabled {
+  background-color: #a0cfff;
+  cursor: not-allowed;
+}
+
+/* 链接文本（如“忘记密码”/“注册账号”） */
+.link-text {
+  margin-top: 20px;
+  color: #606266;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+/* 链接文本 hover 状态 */
+.link-text:hover {
+  color: #409eff;
+  text-decoration: underline;
+}
 </style>

@@ -328,82 +328,466 @@ function jumpToResource(path) {
   router.push({ name: 'FolderFiles', params: { courseNo: topic.value.course.courseNo }, query: { path: pathParts.join('/'), folderName: '关联目录' } })
 }
 
-function getIcon(n) { const e = n.split('.').pop().toLowerCase(); return e==='pdf'?'📕':['jpg','png','jpeg'].includes(e)?'🖼️':'📄' }
-function canPreview(t) { return t?.includes('image') || t?.includes('pdf') || t?.includes('text') }
-function downloadFile(f) { window.open(`/api/attachments/download/${topic.value.forumNo}/${f.accessUrl.split('/').pop()}?download=true`, '_blank') }
-function previewFile(f) { window.open(f.previewUrl || `/api/attachments/preview/${topic.value.forumNo}/${f.accessUrl.split('/').pop()}`, '_blank') }
+function getIcon(n) {
+  const e = n.split('.').pop().toLowerCase();
+  return e === 'pdf' ? '📕' : ['jpg', 'png', 'jpeg'].includes(e) ? '🖼️' : '📄';
+}
+
+function canPreview(t) {
+  return t?.includes('image') || t?.includes('pdf') || t?.includes('text');
+}
+
+function downloadFile(f) {
+  window.open(`/api/attachments/download/${topic.value.forumNo}/${f.accessUrl.split('/').pop()}?download=true`, '_blank');
+}
+
+function previewFile(f) {
+  window.open(f.previewUrl || `/api/attachments/preview/${topic.value.forumNo}/${f.accessUrl.split('/').pop()}`, '_blank');
+}
 </script>
 
 <style scoped>
-.detail-page { background: #f0f2f5; min-height: 100vh; padding: 40px 20px; }
-.content-card { max-width: 850px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 25px rgba(0,0,0,0.06); }
-.detail-header { border-bottom: 1px solid #f0f0f0; padding-bottom: 25px; margin-bottom: 30px; }
-.back-btn { background: #fff; border: 1px solid #d9d9d9; padding: 6px 14px; border-radius: 6px; cursor: pointer; color: #666; transition: all 0.3s; margin-bottom: 15px; }
-.back-btn:hover { color: #409eff; border-color: #409eff; }
-.detail-header h1 { margin: 10px 0; color: #1f1f1f; font-size: 26px; font-weight: 700; line-height: 1.4; }
+/* 详情页整体容器 */
+.detail-page {
+  background: #f0f2f5;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
 
-.meta-row { display: flex; align-items: center; gap: 12px; color: #8c8c8c; font-size: 14px; flex-wrap: wrap; }
-.user-badge { background: #e6f7ff; padding: 4px 12px; border-radius: 20px; color: #1890ff; font-weight: 600; }
+/* 内容卡片（核心内容容器） */
+.content-card {
+  max-width: 850px;
+  margin: 0 auto;
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.06);
+}
+
+/* 详情页头部区域 */
+.detail-header {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 25px;
+  margin-bottom: 30px;
+}
+
+/* 返回按钮样式 */
+.back-btn {
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.3s;
+  margin-bottom: 15px;
+}
+
+/* 返回按钮 hover 状态 */
+.back-btn:hover {
+  color: #409eff;
+  border-color: #409eff;
+}
+
+/* 详情页主标题 */
+.detail-header h1 {
+  margin: 10px 0;
+  color: #1f1f1f;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* 元信息行（作者/时间/状态等） */
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #8c8c8c;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+
+/* 用户徽章样式 */
+.user-badge {
+  background: #e6f7ff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: #1890ff;
+  font-weight: 600;
+}
 
 /* 关注按钮样式 */
-.follow-btn { border: 1px solid #1890ff; color: #1890ff; background: #fff; padding: 2px 10px; border-radius: 15px; cursor: pointer; font-size: 12px; transition: 0.3s; }
-.follow-btn:hover { background: #e6f7ff; }
-.follow-btn.is-following { background: #f5f5f5; border-color: #d9d9d9; color: #8c8c8c; }
-
-.stats-group { display: flex; gap: 15px; margin-left: auto; }
-.stat-item { display: flex; align-items: center; gap: 4px; }
-.like-count.liked { color: #f5222d; font-weight: bold; }
-
-.path-jump-box { margin-top: 18px; background: #f6ffed; padding: 10px 16px; border-radius: 8px; border: 1px solid #b7eb8f; display: flex; align-items: center; }
-.path-label { font-size: 13px; color: #52c41a; font-weight: bold; }
-.path-link { color: #1890ff; text-decoration: none; font-family: monospace; font-size: 13px; margin-left: 8px; }
-
-.main-body { line-height: 1.8; font-size: 16px; color: #434343; white-space: pre-wrap; min-height: 120px; margin-bottom: 40px; }
-
-/* 交互栏样式 */
-.interaction-bar { display: flex; justify-content: center; gap: 20px; margin: 40px 0; padding: 20px 0; border-top: 1px solid #f5f5f5; }
-.like-button, .collect-button {
-  display: flex; align-items: center; gap: 10px; padding: 10px 24px;
-  border-radius: 30px; border: 1px solid #d9d9d9; background: #fff;
-  cursor: pointer; transition: 0.3s;
+.follow-btn {
+  border: 1px solid #1890ff;
+  color: #1890ff;
+  background: #fff;
+  padding: 2px 10px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: 0.3s;
 }
-.like-button.active { background: #fff1f0; border-color: #ffccc7; color: #ff4d4f; }
-.collect-button.active { background: #fffbe6; border-color: #ffe58f; color: #faad14; }
 
-.attachments-area { border-top: 2px solid #f0f0f0; padding-top: 30px; margin-top: 40px; }
-.section-title { font-size: 18px; color: #262626; margin-bottom: 20px; font-weight: 600; border-left: 4px solid #1890ff; padding-left: 12px; }
-.attachment-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 16px; }
-.attachment-item { display: flex; align-items: center; padding: 12px; background: #fafafa; border: 1px solid #f0f0f0; border-radius: 10px; }
-.file-info-text { flex: 1; overflow: hidden; }
-.file-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.btn-att { border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-left: 5px; color: #fff; }
-.btn-att.download { background: #1890ff; }
-.btn-att.preview { background: #faad14; }
+/* 关注按钮 hover 状态 */
+.follow-btn:hover {
+  background: #e6f7ff;
+}
 
-.comments-section { margin-top: 50px; border-top: 2px solid #f0f0f0; padding-top: 30px; }
-.comment-editor { background: #fafafa; padding: 20px; border-radius: 12px; margin-bottom: 30px; }
-.comment-editor textarea { width: 100%; border: 1px solid #d9d9d9; border-radius: 8px; padding: 12px; resize: none; margin-bottom: 12px; box-sizing: border-box; }
-.editor-footer { display: flex; justify-content: space-between; align-items: center; }
-.upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; }
-.btn-upload { border: 1px solid #d9d9d9; background: #fff; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; }
-.upload-btn-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
-.btn-submit-comment { background: #1890ff; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+/* 已关注状态的关注按钮 */
+.follow-btn.is-following {
+  background: #f5f5f5;
+  border-color: #d9d9d9;
+  color: #8c8c8c;
+}
 
-.comment-item-container { border-bottom: 1px solid #f0f0f0; padding: 20px 0; }
-.comment-author-info { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
-.c-user { font-weight: 600; color: #262626; font-size: 14px; }
-.c-date { color: #bfbfbf; font-size: 12px; }
-.comment-text { font-size: 14px; color: #434343; line-height: 1.6; margin-bottom: 10px; }
-.comment-footer { display: flex; gap: 20px; }
-.c-action { font-size: 13px; color: #8c8c8c; cursor: pointer; }
-.c-action.is-liked { color: #f5222d; font-weight: bold; }
-.c-action:hover { color: #1890ff; }
-.c-action.delete { color: #ff7875; }
+/* 统计信息组（点赞/收藏/评论数） */
+.stats-group {
+  display: flex;
+  gap: 15px;
+  margin-left: auto;
+}
 
-.replies-container { background: #f9f9f9; border-radius: 8px; padding: 15px; margin-top: 15px; margin-left: 20px; }
-.reply-item { padding: 10px 0; border-bottom: 1px solid #eee; }
-.reply-editor { margin-top: 15px; margin-left: 20px; display: flex; gap: 10px; }
-.reply-editor input { flex: 1; border: 1px solid #d9d9d9; border-radius: 4px; padding: 8px 12px; }
-.reply-editor button { background: #1890ff; color: #fff; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer; }
-.delete-link { color: #ff4d4f; background: none; border: none; cursor: pointer; font-size: 13px; margin-left: 20px; }
+/* 单个统计项 */
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 已点赞的点赞数样式 */
+.like-count.liked {
+  color: #f5222d;
+  font-weight: bold;
+}
+
+/* 路径跳转盒子 */
+.path-jump-box {
+  margin-top: 18px;
+  background: #f6ffed;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #b7eb8f;
+  display: flex;
+  align-items: center;
+}
+
+/* 路径标签文本 */
+.path-label {
+  font-size: 13px;
+  color: #52c41a;
+  font-weight: bold;
+}
+
+/* 路径链接样式 */
+.path-link {
+  color: #1890ff;
+  text-decoration: none;
+  font-family: monospace;
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+/* 主内容区域（正文） */
+.main-body {
+  line-height: 1.8;
+  font-size: 16px;
+  color: #434343;
+  white-space: pre-wrap;
+  min-height: 120px;
+  margin-bottom: 40px;
+}
+
+/* 交互栏样式（点赞/收藏按钮容器） */
+.interaction-bar {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 40px 0;
+  padding: 20px 0;
+  border-top: 1px solid #f5f5f5;
+}
+
+/* 点赞按钮 & 收藏按钮基础样式 */
+.like-button,
+.collect-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  border-radius: 30px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* 点赞按钮激活态（已点赞） */
+.like-button.active {
+  background: #fff1f0;
+  border-color: #ffccc7;
+  color: #ff4d4f;
+}
+
+/* 收藏按钮激活态（已收藏） */
+.collect-button.active {
+  background: #fffbe6;
+  border-color: #ffe58f;
+  color: #faad14;
+}
+
+/* 附件区域容器 */
+.attachments-area {
+  border-top: 2px solid #f0f0f0;
+  padding-top: 30px;
+  margin-top: 40px;
+}
+
+/* 区域标题通用样式（附件/评论区标题） */
+.section-title {
+  font-size: 18px;
+  color: #262626;
+  margin-bottom: 20px;
+  font-weight: 600;
+  border-left: 4px solid #1890ff;
+  padding-left: 12px;
+}
+
+/* 附件列表网格布局 */
+.attachment-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 16px;
+}
+
+/* 单个附件项 */
+.attachment-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+}
+
+/* 附件文件信息文本容器 */
+.file-info-text {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 附件文件名 */
+.file-name {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 附件操作按钮基础样式 */
+.btn-att {
+  border: none;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  margin-left: 5px;
+  color: #fff;
+}
+
+/* 附件下载按钮 */
+.btn-att.download {
+  background: #1890ff;
+}
+
+/* 附件预览按钮 */
+.btn-att.preview {
+  background: #faad14;
+}
+
+/* 评论区容器 */
+.comments-section {
+  margin-top: 50px;
+  border-top: 2px solid #f0f0f0;
+  padding-top: 30px;
+}
+
+/* 评论编辑器容器 */
+.comment-editor {
+  background: #fafafa;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+/* 评论编辑器文本域 */
+.comment-editor textarea {
+  width: 100%;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  padding: 12px;
+  resize: none;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+
+/* 编辑器底部（上传/提交按钮区） */
+.editor-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 上传按钮包装器（用于隐藏原生文件输入框） */
+.upload-btn-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+/* 上传按钮样式 */
+.btn-upload {
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* 原生文件上传输入框（隐藏） */
+.upload-btn-wrapper input[type=file] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* 提交评论按钮 */
+.btn-submit-comment {
+  background: #1890ff;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* 单个评论项容器 */
+.comment-item-container {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 20px 0;
+}
+
+/* 评论作者信息区域 */
+.comment-author-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* 评论作者名称 */
+.c-user {
+  font-weight: 600;
+  color: #262626;
+  font-size: 14px;
+}
+
+/* 评论发布时间 */
+.c-date {
+  color: #bfbfbf;
+  font-size: 12px;
+}
+
+/* 评论文本内容 */
+.comment-text {
+  font-size: 14px;
+  color: #434343;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+/* 评论页脚（点赞/回复/删除操作） */
+.comment-footer {
+  display: flex;
+  gap: 20px;
+}
+
+/* 评论操作按钮（点赞/回复） */
+.c-action {
+  font-size: 13px;
+  color: #8c8c8c;
+  cursor: pointer;
+}
+
+/* 已点赞的评论操作按钮 */
+.c-action.is-liked {
+  color: #f5222d;
+  font-weight: bold;
+}
+
+/* 评论操作按钮 hover 状态 */
+.c-action:hover {
+  color: #1890ff;
+}
+
+/* 评论删除操作按钮 */
+.c-action.delete {
+  color: #ff7875;
+}
+
+/* 回复列表容器 */
+.replies-container {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+  margin-left: 20px;
+}
+
+/* 单个回复项 */
+.reply-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* 回复编辑器 */
+.reply-editor {
+  margin-top: 15px;
+  margin-left: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+/* 回复编辑器输入框 */
+.reply-editor input {
+  flex: 1;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+/* 回复编辑器提交按钮 */
+.reply-editor button {
+  background: #1890ff;
+  color: #fff;
+  border: none;
+  padding: 0 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 删除链接（评论/回复删除） */
+.delete-link {
+  color: #ff4d4f;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  margin-left: 20px;
+}
 </style>

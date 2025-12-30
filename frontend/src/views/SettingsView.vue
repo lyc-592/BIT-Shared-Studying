@@ -334,55 +334,368 @@ const goToPage = (path) => router.push(path)
 </script>
 
 <style scoped>
-.home-container { height: 100vh; width: 100%; display: flex; background-color: #f5f7fa; }
-.sidebar { width: 220px; background-color: #001529; color: #fff; display: flex; flex-direction: column; padding: 20px 16px; flex-shrink: 0; }
-.logo { font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: center; color: #fff; }
-.nav-menu { display: flex; flex-direction: column; gap: 10px; }
-.nav-item { width: 100%; padding: 10px 12px; border: none; border-radius: 4px; background: transparent; color: #ccc; text-align: left; cursor: pointer; font-size: 15px; transition: all 0.3s; }
-.nav-item:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
-.nav-item.active { background-color: #409eff; color: #fff; font-weight: bold; }
+/* 首页整体容器 */
+.home-container {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  background-color: #f5f7fa;
+}
 
-.main-content { flex: 1; padding: 30px 50px; overflow-y: auto; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #e8e8e8; padding-bottom: 15px; }
-.page-header h2 { font-size: 24px; color: #303133; margin: 0 0 5px 0; }
-.sub-title { color: #909399; font-size: 14px; }
-.header-right { display: flex; align-items: center; gap: 15px; }
-.btn-logout { background: #f56c6c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+/* 侧边栏样式 */
+.sidebar {
+  width: 220px;
+  background-color: #001529;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 16px;
+  flex-shrink: 0;
+}
 
-.profile-card, .admin-panel { background: #fff; border-radius: 8px; padding: 30px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05); max-width: 850px; margin-bottom: 30px; }
-.card-title { margin-top: 0; margin-bottom: 20px; border-left: 4px solid #409eff; padding-left: 10px; color: #303133; }
+/* 侧边栏 Logo 样式 */
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #fff;
+}
 
-.form-body { display: flex; flex-direction: column; gap: 20px; }
-.form-row { display: flex; gap: 30px; }
-.form-group { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-.full-width { width: 100%; }
-label { font-size: 14px; font-weight: 500; color: #606266; }
-input, select, textarea { padding: 10px; border: 1px solid #dcdfe6; border-radius: 4px; font-size: 14px; color: #606266; background-color: #fff; }
-textarea { resize: vertical; }
-.input-disabled { background-color: #f5f7fa; color: #909399; cursor: not-allowed; }
-.action-footer { margin-top: 20px; display: flex; align-items: center; gap: 15px; }
-.btn-save { padding: 10px 24px; border-radius: 4px; border: none; cursor: pointer; background-color: #409eff; color: #fff; font-size: 14px; }
-.btn-save:hover { background-color: #66b1ff; }
-.msg-tip { font-size: 14px; }
-.msg-tip.success { color: #67c23a; }
-.msg-tip.error { color: #f56c6c; }
+/* 侧边栏导航菜单容器 */
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-.admin-title { border-color: #e6a23c; }
-.admin-desc { color: #606266; margin-bottom: 25px; background: #fdf6ec; padding: 10px; border-radius: 4px; border: 1px solid #faecd8; }
-.admin-actions { display: flex; gap: 30px; }
-.admin-form-box { flex: 1; background: #f9f9f9; padding: 20px; border-radius: 6px; border: 1px solid #eee; }
-.admin-form-box h4 { margin-top: 0; margin-bottom: 15px; color: #303133; }
-.btn-grant { background: #67c23a; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 10px; }
-.revoke-box { border-color: #fde2e2; background: #fef0f0; }
-.revoke-box h4 { color: #f56c6c; }
-.tip-text { font-size: 12px; color: #909399; margin: 0 0 10px 0; }
-.btn-revoke { background: #f56c6c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 10px; }
-.admin-msg { margin-top: 20px; padding: 10px; border-radius: 4px; text-align: center; }
-.admin-msg.success { background: #f0f9eb; color: #67c23a; }
-.admin-msg.error { background: #fef0f0; color: #f56c6c; }
-.guest-state { display: flex; justify-content: center; margin-top: 100px; }
-.guest-box { background: white; padding: 40px; border-radius: 8px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.guest-box h2 { color: #f56c6c; margin-bottom: 10px; }
-.btn-primary { background: #409eff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-top: 15px; }
-.loading-state { text-align: center; color: #999; margin-top: 50px; }
+/* 侧边栏导航项基础样式 */
+.nav-item {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #ccc;
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s;
+}
+
+/* 侧边栏导航项 hover 状态 */
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* 侧边栏激活态导航项 */
+.nav-item.active {
+  background-color: #409eff;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* 主内容区域 */
+.main-content {
+  flex: 1;
+  padding: 30px 50px;
+  overflow-y: auto;
+}
+
+/* 页面头部区域 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e8e8e8;
+  padding-bottom: 15px;
+}
+
+/* 页面头部标题 */
+.page-header h2 {
+  font-size: 24px;
+  color: #303133;
+  margin: 0 0 5px 0;
+}
+
+/* 页面副标题 */
+.sub-title {
+  color: #909399;
+  font-size: 14px;
+}
+
+/* 页面头部右侧区域 */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* 退出登录按钮 */
+.btn-logout {
+  background: #f56c6c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* 个人资料卡片 & 管理员面板通用样式 */
+.profile-card,
+.admin-panel {
+  background: #fff;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  max-width: 850px;
+  margin-bottom: 30px;
+}
+
+/* 卡片标题样式 */
+.card-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+  border-left: 4px solid #409eff;
+  padding-left: 10px;
+  color: #303133;
+}
+
+/* 表单主体容器 */
+.form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 表单行（横向排列多个表单组） */
+.form-row {
+  display: flex;
+  gap: 30px;
+}
+
+/* 表单组容器 */
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 全宽样式（用于表单组/控件） */
+.full-width {
+  width: 100%;
+}
+
+/* 表单标签样式 */
+label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #606266;
+}
+
+/* 表单输入控件通用样式（输入框/下拉/文本域） */
+input,
+select,
+textarea {
+  padding: 10px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #606266;
+  background-color: #fff;
+}
+
+/* 文本域可垂直调整大小 */
+textarea {
+  resize: vertical;
+}
+
+/* 禁用状态的输入控件 */
+.input-disabled {
+  background-color: #f5f7fa;
+  color: #909399;
+  cursor: not-allowed;
+}
+
+/* 表单操作页脚（按钮+提示区） */
+.action-footer {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* 保存按钮样式 */
+.btn-save {
+  padding: 10px 24px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  background-color: #409eff;
+  color: #fff;
+  font-size: 14px;
+}
+
+/* 保存按钮 hover 状态 */
+.btn-save:hover {
+  background-color: #66b1ff;
+}
+
+/* 提示文本基础样式 */
+.msg-tip {
+  font-size: 14px;
+}
+
+/* 成功提示文本 */
+.msg-tip.success {
+  color: #67c23a;
+}
+
+/* 错误提示文本 */
+.msg-tip.error {
+  color: #f56c6c;
+}
+
+/* 管理员面板标题（修改左侧边框色） */
+.admin-title {
+  border-color: #e6a23c;
+}
+
+/* 管理员面板描述文本 */
+.admin-desc {
+  color: #606266;
+  margin-bottom: 25px;
+  background: #fdf6ec;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #faecd8;
+}
+
+/* 管理员操作区域（授权+撤销横向排列） */
+.admin-actions {
+  display: flex;
+  gap: 30px;
+}
+
+/* 管理员表单盒子通用样式 */
+.admin-form-box {
+  flex: 1;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+/* 管理员表单盒子标题 */
+.admin-form-box h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #303133;
+}
+
+/* 授权按钮样式 */
+.btn-grant {
+  background: #67c23a;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* 撤销操作盒子（修改边框/背景色） */
+.revoke-box {
+  border-color: #fde2e2;
+  background: #fef0f0;
+}
+
+/* 撤销操作盒子标题（修改文字色） */
+.revoke-box h4 {
+  color: #f56c6c;
+}
+
+/* 小提示文本 */
+.tip-text {
+  font-size: 12px;
+  color: #909399;
+  margin: 0 0 10px 0;
+}
+
+/* 撤销按钮样式 */
+.btn-revoke {
+  background: #f56c6c;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* 管理员操作提示信息基础样式 */
+.admin-msg {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* 管理员操作成功提示 */
+.admin-msg.success {
+  background: #f0f9eb;
+  color: #67c23a;
+}
+
+/* 管理员操作错误提示 */
+.admin-msg.error {
+  background: #fef0f0;
+  color: #f56c6c;
+}
+
+/* 访客状态容器（居中展示） */
+.guest-state {
+  display: flex;
+  justify-content: center;
+  margin-top: 100px;
+}
+
+/* 访客提示盒子 */
+.guest-box {
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* 访客盒子标题 */
+.guest-box h2 {
+  color: #f56c6c;
+  margin-bottom: 10px;
+}
+
+/* 主按钮样式（访客页用） */
+.btn-primary {
+  background: #409eff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+/* 加载状态样式 */
+.loading-state {
+  text-align: center;
+  color: #999;
+  margin-top: 50px;
+}
 </style>

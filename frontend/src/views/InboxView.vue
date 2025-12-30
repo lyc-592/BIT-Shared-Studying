@@ -314,51 +314,286 @@ const formatDate = (dateStr) => {
 </script>
 
 <style scoped>
-.home-container { height: 100vh; width: 100%; display: flex; background-color: #f5f7fa; }
-.sidebar { width: 220px; background-color: #001529; color: #fff; display: flex; flex-direction: column; padding: 20px 16px; flex-shrink: 0; }
-.logo { font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: center; color: #fff; }
-.nav-menu { display: flex; flex-direction: column; gap: 10px; }
-.nav-item { width: 100%; padding: 10px 12px; border: none; border-radius: 4px; background: transparent; color: #ccc; text-align: left; cursor: pointer; font-size: 15px; transition: all 0.3s; position: relative;}
-.nav-item:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
-.nav-item.active { background-color: #409eff; color: #fff; font-weight: bold; }
+/* 首页整体容器 */
+.home-container {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  background-color: #f5f7fa;
+}
 
-.unread-badge { background: #f56c6c; color: white; border-radius: 10px; padding: 0 6px; font-size: 11px; margin-left: 5px; }
+/* 侧边栏样式 */
+.sidebar {
+  width: 220px;
+  background-color: #001529;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 16px;
+  flex-shrink: 0;
+}
 
-.main-content { flex: 1; padding: 30px 50px; overflow-y: auto; display: flex; flex-direction: column;}
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #e8e8e8; padding-bottom: 15px; }
-.page-header h2 { font-size: 24px; color: #303133; margin: 0; }
-.sub-title { color: #909399; font-size: 14px; }
+/* 侧边栏 Logo 样式 */
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #fff;
+}
 
-.btn-apply-admin { background: #67c23a; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+/* 侧边栏导航菜单容器 */
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-.mailbox-wrapper { flex: 1; display: flex; gap: 20px; min-height: 0; }
-.shadow-card { background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05); }
+/* 侧边栏导航项基础样式 */
+.nav-item {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #ccc;
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s;
+  position: relative;
+}
 
-.message-list-panel { width: 320px; overflow-y: auto; display: flex; flex-direction: column; }
-.message-item { padding: 15px 20px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: all 0.2s; position: relative; }
-.message-item:hover { background: #f9f9f9; }
-.message-item.is-active { background: #ecf5ff; border-left: 4px solid #409eff; }
-.message-item.is-unread { background: #fff; }
-.message-item.is-unread .msg-title { font-weight: bold; color: #303133; }
+/* 侧边栏导航项 hover 状态 */
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
 
-.unread-dot { position: absolute; top: 18px; right: 15px; width: 8px; height: 8px; background: #409eff; border-radius: 50%; }
-.msg-title { font-size: 14px; color: #606266; margin-bottom: 8px; line-height: 1.4; }
-.msg-info { font-size: 12px; color: #999; display: flex; justify-content: space-between; }
+/* 侧边栏激活态导航项 */
+.nav-item.active {
+  background-color: #409eff;
+  color: #fff;
+  font-weight: bold;
+}
 
-.message-detail-panel { flex: 1; overflow-y: auto; padding: 30px; }
-.detail-placeholder { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ccc; }
-.detail-placeholder .icon { font-size: 60px; margin-bottom: 10px; }
+/* 未读消息徽章 */
+.unread-badge {
+  background: #f56c6c;
+  color: white;
+  border-radius: 10px;
+  padding: 0 6px;
+  font-size: 11px;
+  margin-left: 5px;
+}
 
-.detail-header-info { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
-.detail-header-info h3 { margin: 0 0 10px 0; color: #303133; }
-.meta { font-size: 13px; color: #999; display: flex; gap: 20px; }
+/* 主内容区域 */
+.main-content {
+  flex: 1;
+  padding: 30px 50px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
 
-.content-text { font-size: 15px; line-height: 1.6; color: #606266; white-space: pre-wrap; margin-bottom: 30px; }
+/* 页面头部区域 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #e8e8e8;
+  padding-bottom: 15px;
+}
 
-.action-box { background: #f8f9fa; border: 1px solid #eee; border-radius: 8px; padding: 20px; }
-.action-box h4 { margin-top: 0; color: #303133; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-.info-grid p { margin: 8px 0; font-size: 14px; }
-.status-tag { background: #e6a23c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+/* 页面头部标题 */
+.page-header h2 {
+  font-size: 24px;
+  color: #303133;
+  margin: 0;
+}
+
+/* 页面副标题 */
+.sub-title {
+  color: #909399;
+  font-size: 14px;
+}
+
+/* 申请管理员按钮 */
+.btn-apply-admin {
+  background: #67c23a;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* 邮箱/消息容器包装器 */
+.mailbox-wrapper {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  min-height: 0;
+}
+
+/* 通用阴影卡片样式 */
+.shadow-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* 消息列表面板 */
+.message-list-panel {
+  width: 320px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 消息项基础样式 */
+.message-item {
+  padding: 15px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+/* 消息项 hover 状态 */
+.message-item:hover {
+  background: #f9f9f9;
+}
+
+/* 消息项激活态（选中） */
+.message-item.is-active {
+  background: #ecf5ff;
+  border-left: 4px solid #409eff;
+}
+
+/* 未读消息项基础样式 */
+.message-item.is-unread {
+  background: #fff;
+}
+
+/* 未读消息项标题样式 */
+.message-item.is-unread .msg-title {
+  font-weight: bold;
+  color: #303133;
+}
+
+/* 未读消息红点 */
+.unread-dot {
+  position: absolute;
+  top: 18px;
+  right: 15px;
+  width: 8px;
+  height: 8px;
+  background: #409eff;
+  border-radius: 50%;
+}
+
+/* 消息标题 */
+.msg-title {
+  font-size: 14px;
+  color: #606266;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+/* 消息元信息（时间/发送方等） */
+.msg-info {
+  font-size: 12px;
+  color: #999;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 消息详情面板 */
+.message-detail-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px;
+}
+
+/* 详情面板占位符（未选中消息时） */
+.detail-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+}
+
+/* 占位符图标 */
+.detail-placeholder .icon {
+  font-size: 60px;
+  margin-bottom: 10px;
+}
+
+/* 详情头部信息区域 */
+.detail-header-info {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+/* 详情头部标题 */
+.detail-header-info h3 {
+  margin: 0 0 10px 0;
+  color: #303133;
+}
+
+/* 详情元信息（时间/来源等） */
+.meta {
+  font-size: 13px;
+  color: #999;
+  display: flex;
+  gap: 20px;
+}
+
+/* 消息内容文本 */
+.content-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #606266;
+  white-space: pre-wrap;
+  margin-bottom: 30px;
+}
+
+/* 操作框容器 */
+.action-box {
+  background: #f8f9fa;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* 操作框标题 */
+.action-box h4 {
+  margin-top: 0;
+  color: #303133;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+/* 信息网格文本 */
+.info-grid p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+/* 状态标签 */
+.status-tag {
+  background: #e6a23c;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
 
 /* AI 结果样式 */
 .ai-audit-results {
@@ -368,33 +603,171 @@ const formatDate = (dateStr) => {
   border: 1px solid #bae7ff;
   border-radius: 6px;
 }
-.ai-title { font-weight: bold; margin-bottom: 8px; color: #0050b3; font-size: 14px; }
-.ai-failed { color: #8c8c8c; font-style: italic; }
+
+/* AI 结果标题 */
+.ai-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #0050b3;
+  font-size: 14px;
+}
+
+/* AI 结果失败提示 */
+.ai-failed {
+  color: #8c8c8c;
+  font-style: italic;
+}
+
+/* AI 结果徽章基础样式 */
 .ai-badge {
   padding: 3px 10px;
   border-radius: 4px;
   font-weight: bold;
   font-size: 13px;
 }
-.ai-badge.manual_review { background-color: #fff7e6; color: #d46b08; border: 1px solid #ffd591; }
-.ai-badge.reject { background-color: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
-.ai-reason { margin-top: 8px; font-size: 13px; color: #595959; background: white; padding: 5px; border-radius: 4px; }
 
-.button-group { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
-.btn-action { border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 13px; color: white; }
-.btn-action.preview { background: #409eff; }
-.btn-action.download { background: #909399; }
-.btn-action.approve { background: #67c23a; }
-.btn-action.reject { background: #f56c6c; }
-.btn-download-word { background: #e6a23c; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+/* AI 徽章 - 人工审核状态 */
+.ai-badge.manual_review {
+  background-color: #fff7e6;
+  color: #d46b08;
+  border: 1px solid #ffd591;
+}
 
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; }
-.modal-box { background: white; border-radius: 8px; width: 450px; padding: 30px; }
-.modal-footer { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
-.btn-cancel { background: #eee; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; }
-.btn-submit { background: #409eff; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; }
+/* AI 徽章 - 驳回状态 */
+.ai-badge.reject {
+  background-color: #fff1f0;
+  color: #cf1322;
+  border: 1px solid #ffa39e;
+}
 
-.form-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
-.form-group label { font-size: 14px; font-weight: bold; color: #606266; }
-.form-group select, .form-group textarea, .form-group input { padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px; }
+/* AI 驳回原因 */
+.ai-reason {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #595959;
+  background: white;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+/* 按钮组容器 */
+.button-group {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* 操作按钮基础样式 */
+.btn-action {
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: white;
+}
+
+/* 预览按钮 */
+.btn-action.preview {
+  background: #409eff;
+}
+
+/* 下载按钮 */
+.btn-action.download {
+  background: #909399;
+}
+
+/* 批准按钮 */
+.btn-action.approve {
+  background: #67c23a;
+}
+
+/* 驳回按钮 */
+.btn-action.reject {
+  background: #f56c6c;
+}
+
+/* 下载Word按钮 */
+.btn-download-word {
+  background: #e6a23c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 模态框遮罩层 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 模态框容器 */
+.modal-box {
+  background: white;
+  border-radius: 8px;
+  width: 450px;
+  padding: 30px;
+}
+
+/* 模态框底部按钮区 */
+.modal-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* 取消按钮 */
+.btn-cancel {
+  background: #eee;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 提交按钮 */
+.btn-submit {
+  background: #409eff;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 表单组容器 */
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 表单标签 */
+.form-group label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #606266;
+}
+
+/* 表单输入控件（下拉/文本域/输入框） */
+.form-group select,
+.form-group textarea,
+.form-group input {
+  padding: 8px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+}
 </style>

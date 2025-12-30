@@ -376,43 +376,284 @@ async function handleRequestUpload() {
 </script>
 
 <style scoped>
-.folder-view { padding: 30px; background-color: #f5f7fa; min-height: 100vh; }
-.header { margin-bottom: 20px; border-bottom: 1px solid #e4e7ed; padding-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
-.back-btn { align-self: flex-start; cursor: pointer; background: white; border: 1px solid #dcdfe6; padding: 6px 15px; border-radius: 4px; color: #606266; }
-.header-info h2 { margin: 0; color: #303133; font-size: 22px; }
-.path-info { color: #909399; font-size: 13px; margin-top: 5px; display: block; }
-.upload-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 20px; display: flex; align-items: center; gap: 15px; }
-.section-label { font-weight: bold; color: #606266; }
-.upload-controls { display: flex; gap: 10px; align-items: center; }
-.upload-btn { background-color: #409eff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
-.batch-bar { background: #e6f7ff; border: 1px solid #91d5ff; padding: 10px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-.select-all-label { cursor: pointer; font-weight: bold; color: #1890ff; display: flex; align-items: center; gap: 8px; }
-.batch-btn { padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; font-size: 14px; color: white; }
-.batch-btn.download { background-color: #1890ff; }
-.file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-.empty-state { grid-column: 1 / -1; text-align: center; color: #909399; padding: 40px; background: #fff; border-radius: 8px; }
-.empty-icon { font-size: 48px; }
-.file-card { background: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.2s; border: 1px solid #ebeef5; display: flex; flex-direction: column; align-items: center; position: relative; cursor: pointer; }
-.file-card.is-selected { border-color: #409eff; background-color: #ecf5ff; box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2); }
-.file-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.card-checkbox { position: absolute; top: 10px; left: 10px; z-index: 5; }
-.card-checkbox input { width: 18px; height: 18px; cursor: pointer; }
-.file-icon { font-size: 40px; margin-bottom: 15px; }
-.file-info { width: 100%; }
-.file-name { font-weight: 500; color: #303133; margin-bottom: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.file-actions { display: flex; flex-direction: column; gap: 8px; width: 100%; }
-.action-btn { font-size: 13px; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; width: 100%; }
-.preview-btn { background-color: #e6a23c; color: white; }
-.download-btn { background-color: #409eff; color: white; }
+/* 文件夹视图整体容器 */
+.folder-view {
+  padding: 30px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* 头部区域样式 */
+.header {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e4e7ed;
+  padding-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 返回按钮样式 */
+.back-btn {
+  align-self: flex-start;
+  cursor: pointer;
+  background: white;
+  border: 1px solid #dcdfe6;
+  padding: 6px 15px;
+  border-radius: 4px;
+  color: #606266;
+}
+
+/* 头部信息标题 */
+.header-info h2 {
+  margin: 0;
+  color: #303133;
+  font-size: 22px;
+}
+
+/* 路径信息文本 */
+.path-info {
+  color: #909399;
+  font-size: 13px;
+  margin-top: 5px;
+  display: block;
+}
+
+/* 上传区域容器 */
+.upload-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* 区域标签样式 */
+.section-label {
+  font-weight: bold;
+  color: #606266;
+}
+
+/* 上传控制按钮组 */
+.upload-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* 上传按钮样式 */
+.upload-btn {
+  background-color: #409eff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 批量操作栏 */
+.batch-bar {
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 全选标签样式 */
+.select-all-label {
+  cursor: pointer;
+  font-weight: bold;
+  color: #1890ff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 批量操作按钮基础样式 */
+.batch-btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+}
+
+/* 批量下载按钮样式 */
+.batch-btn.download {
+  background-color: #1890ff;
+}
+
+/* 文件网格布局容器 */
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* 空状态样式 */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #909399;
+  padding: 40px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+/* 空状态图标 */
+.empty-icon {
+  font-size: 48px;
+}
+
+/* 文件卡片基础样式 */
+.file-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+  border: 1px solid #ebeef5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+/* 文件卡片选中状态 */
+.file-card.is-selected {
+  border-color: #409eff;
+  background-color: #ecf5ff;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+}
+
+/* 文件卡片 hover 状态 */
+.file-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* 卡片复选框容器 */
+.card-checkbox {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 5;
+}
+
+/* 卡片复选框输入框 */
+.card-checkbox input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* 文件图标样式 */
+.file-icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+/* 文件信息容器 */
+.file-info {
+  width: 100%;
+}
+
+/* 文件名样式 */
+.file-name {
+  font-weight: 500;
+  color: #303133;
+  margin-bottom: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* 文件操作按钮组 */
+.file-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/* 操作按钮基础样式 */
+.action-btn {
+  font-size: 13px;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* 预览按钮样式 */
+.preview-btn {
+  background-color: #e6a23c;
+  color: white;
+}
+
+/* 下载按钮样式 */
+.download-btn {
+  background-color: #409eff;
+  color: white;
+}
 
 /* 添加：申请上传按钮及输入框样式 */
-.request-section { border: 1px solid #e6a23c; background-color: #fdf6ec; }
-.remark-input { padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px; width: 250px; }
-.request-btn { background-color: #e6a23c; }
-.request-btn:hover { background-color: #ebb563; }
+.request-section {
+  border: 1px solid #e6a23c;
+  background-color: #fdf6ec;
+}
 
-.discuss-btn { background-color: #67c23a; color: white; }
-.discuss-btn:hover { background-color: #85ce61; }
-.delete-btn { background-color: #f56c6c; color: white; }
-.loading { text-align: center; color: #909399; padding-top: 50px; }
+/* 备注输入框样式 */
+.remark-input {
+  padding: 8px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  width: 250px;
+}
+
+/* 申请上传按钮样式 */
+.request-btn {
+  background-color: #e6a23c;
+}
+
+/* 申请上传按钮 hover 状态 */
+.request-btn:hover {
+  background-color: #ebb563;
+}
+
+/* 讨论按钮样式 */
+.discuss-btn {
+  background-color: #67c23a;
+  color: white;
+}
+
+/* 讨论按钮 hover 状态 */
+.discuss-btn:hover {
+  background-color: #85ce61;
+}
+
+/* 删除按钮样式 */
+.delete-btn {
+  background-color: #f56c6c;
+  color: white;
+}
+
+/* 加载状态样式 */
+.loading {
+  text-align: center;
+  color: #909399;
+  padding-top: 50px;
+}
 </style>

@@ -240,27 +240,178 @@ async function handleDeleteNode() {
 </script>
 
 <style scoped>
-.tree-container { width: 100%; height: 100vh; position: relative; background: #fdfdfd; display: flex; flex-direction: column; }
-.header { padding: 10px 20px; background: #fff; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; z-index: 10; }
-.chart-box { flex: 1; width: 100%; }
-.nav-btn { cursor: pointer; padding: 6px 12px; background: white; border: 1px solid #dcdfe6; border-radius: 4px; }
-.tip { color: #999; font-size: 12px; margin-left: auto; }
-.action-modal { position: fixed; background: white; border: 1px solid #ebeef5; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 6px; padding: 15px; width: 220px; z-index: 1000; }
-.modal-title { font-weight: bold; margin-bottom: 10px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px; text-align: center; }
-.btn-group { display: flex; flex-direction: column; gap: 8px; }
-button { cursor: pointer; padding: 8px 10px; border-radius: 4px; font-size: 13px; transition: opacity 0.2s; }
-button:hover { opacity: 0.9; }
-.btn-primary { background: #409eff; color: white; border: none; }
-.btn-success { background: #67c23a; color: white; border: none; }
-.btn-warning { background: #E6A23C; color: white; border: none; }
-.btn-danger { background: #f56c6c; color: white; border: none; }
-.sub-action-box { margin-top: 5px; padding-top: 10px; border-top: 1px solid #eee; display: flex; flex-direction: column; gap: 8px; }
-.modal-input { width: 100%; padding: 6px; box-sizing: border-box; border: 1px solid #dcdfe6; border-radius: 4px; }
-.file-input { font-size: 12px; width: 100%; }
-.action-buttons { display: flex; gap: 5px; }
-.confirm-btn { background: #409eff; color: white; border: none; flex: 1; }
-.cancel-btn { background: #909399; color: white; border: none; flex: 1; }
-.close-btn { position: absolute; top: 5px; right: 8px; border: none; background: transparent; font-size: 18px; color: #999; }
+/* 树形结构容器（整体布局） */
+.tree-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  background: #fdfdfd;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 头部导航栏样式 */
+.header {
+  padding: 10px 20px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 10;
+}
+
+/* 图表展示容器 */
+.chart-box {
+  flex: 1;
+  width: 100%;
+}
+
+/* 导航按钮基础样式 */
+.nav-btn {
+  cursor: pointer;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+}
+
+/* 提示文本样式 */
+.tip {
+  color: #999;
+  font-size: 12px;
+  margin-left: auto;
+}
+
+/* 操作弹窗容器 */
+.action-modal {
+  position: fixed;
+  background: white;
+  border: 1px solid #ebeef5;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: 6px;
+  padding: 15px;
+  width: 220px;
+  z-index: 1000;
+}
+
+/* 弹窗标题样式 */
+.modal-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+  text-align: center;
+}
+
+/* 按钮组容器（纵向排列） */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 通用按钮基础样式 */
+button {
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: opacity 0.2s;
+}
+
+/* 通用按钮 hover 状态 */
+button:hover {
+  opacity: 0.9;
+}
+
+/* 主色调按钮（蓝色） */
+.btn-primary {
+  background: #409eff;
+  color: white;
+  border: none;
+}
+
+/* 成功按钮（绿色） */
+.btn-success {
+  background: #67c23a;
+  color: white;
+  border: none;
+}
+
+/* 警告按钮（黄色） */
+.btn-warning {
+  background: #E6A23C;
+  color: white;
+  border: none;
+}
+
+/* 危险按钮（红色） */
+.btn-danger {
+  background: #f56c6c;
+  color: white;
+  border: none;
+}
+
+/* 子操作区域样式 */
+.sub-action-box {
+  margin-top: 5px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 弹窗输入框样式 */
+.modal-input {
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+}
+
+/* 文件上传输入框样式 */
+.file-input {
+  font-size: 12px;
+  width: 100%;
+}
+
+/* 操作按钮组（横向排列） */
+.action-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+/* 确认按钮 */
+.confirm-btn {
+  background: #409eff;
+  color: white;
+  border: none;
+  flex: 1;
+}
+
+/* 取消按钮 */
+.cancel-btn {
+  background: #909399;
+  color: white;
+  border: none;
+  flex: 1;
+}
+
+/* 弹窗关闭按钮 */
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 8px;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  color: #999;
+}
+
 .forum-nav-btn {
   background-color: #f0f9eb !important;
   color: #67c23a !important;
