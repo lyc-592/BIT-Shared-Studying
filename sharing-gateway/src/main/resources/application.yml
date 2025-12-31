@@ -1,0 +1,14 @@
+server:
+  port: 9000   # 网关对外提供的端口，前端以后请求这个
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        # 定义一个路由规则，把 /api/** 转发到你现有后端
+        - id: sharing-backend
+          uri: http://localhost:8080          # 你的现有后端服务地址（如果是别的端口就改这里）
+          predicates:
+            - Path=/api/**                    # 匹配所有 /api/** 的请求
+          filters:
+            - StripPrefix=0                   # 路径不做裁剪，原样转发，例如 /api/auth/login -> /api/auth/login
